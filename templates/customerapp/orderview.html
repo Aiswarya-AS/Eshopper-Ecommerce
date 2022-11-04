@@ -1,0 +1,102 @@
+{% extends 'customerapp/base.html' %}
+{% block content %}
+
+    <!-- Topbar Start -->
+ 
+        
+        {% include 'customerapp/includes/topnav.html' %}
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid">
+        <div class="row border-top px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100" data-toggle="collapse" href="#navbar-vertical" style="height: 65px; margin-top: -1px; padding: 0 30px;">
+                    <h6 class="m-0">Categories</h6>
+                    <i class="fa fa-angle-down text-dark"></i>
+                </a>
+                {% include 'customerapp/includes/navdrop.html' %}
+            </div>
+            <div class="col-lg-9">
+                {% include 'customerapp/includes/navbar.html' %}
+            </div>
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+{% for message in messages %}
+<p>{{ message }}</p>
+{% endfor %}
+    <!-- Page Header Start -->
+  
+    <!-- Page Header End -->
+   
+<!-- model start -->
+
+<!-- model end -->
+
+    <!-- Cart Start -->
+    
+        <div class="row px-xl-5 mt-5">
+            <div class="col-md-12 table-responsive mb-5">
+                <table class="table table-bordered text-center mb-0 text-center">
+                    <thead class="bg-secondary text-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                        {% for order_item in order_items %}
+                        <tr>
+                            <td class="align-middle"> <div class="float-left"> <img src="{{ order_item.product.img1.url }}" alt="" style="width: 50px;">  {{ order_item.product }}</td>
+                            <td class="align-middle">{{ order_item.price }}</td>
+                            <td class="align-middle">{{ order_item.quantity }}</td>
+                            <td class="align-middle" style="color: red;">{{ order_item.status }}</td>
+                            
+                            {% if order_item.status == 'Order Cancelled' %}
+                            <td class="align-middle"> <a href="#myModal" class="trigger-btn" data-toggle="modal"> <button disabled class="btn btn-sm btn-primary " >Cancel Order</button></a></td>
+
+                            {% else %}
+                            <td class="align-middle"> <a href="#myModal" class="trigger-btn" data-toggle="modal"> <button class="btn btn-sm btn-primary">Cancel Order</button></a></td>
+                            {% endif %}
+                        </tr>
+                        <!-- modal -->
+                        <div id="myModal" class="modal fade">
+                            <div class="modal-dialog modal-confirm">
+                                <div class="modal-content">
+                                    <div class="modal-header flex-column">
+                    
+                                        <h4 class="modal-title w-100">Are you sure?</h4>	
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Do you really want to delete these records? This process cannot be undone.</p>
+                                    </div>
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <a href="{% url 'order_cancel' order_item.id %}"> <button class="btn btn-sm btn-primary">Cancel Order</button></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+            </div>
+
+    <!-- Footer Start -->
+    
+    <!-- Footer End -->
+
+
+   
+
+    {% include 'customerapp/includes/footer.html' %}
+{% endblock %}

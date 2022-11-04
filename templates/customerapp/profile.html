@@ -1,0 +1,88 @@
+
+
+
+
+
+
+{% extends 'customerapp/base.html' %}
+
+{% block content %}
+    <!-- Topbar Start -->
+    <div class="container-fluid">
+        {% include 'customerapp/includes/topnav.html' %}
+    </div>
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid">
+        <div class="row border-top px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100" data-toggle="collapse" href="#navbar-vertical" style="height: 65px; margin-top: -1px; padding: 0 30px;">
+                    <h6 class="m-0">Categories</h6>
+                    <i class="fa fa-angle-down text-dark"></i>
+                </a>
+                {% include 'customerapp/includes/navdrop.html' %}
+            </div>
+            <div class="col-lg-9">
+                {% include 'customerapp/includes/navbar.html' %}
+            </div>
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary mb-5">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Your Address</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="">Home</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Your Address</p>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+
+    <!-- Cart Start -->
+    <div class="container-fluid pt-5">
+        <div class="row px-xl-5">
+            <div class="col-lg-8 table-responsive mb-5">
+             
+              <div class="  ">
+                  <a href="{% url 'add_address' %}"><button class="btn btn-primary ">Add New Address</button></a>
+              </div>
+              <div class="container mt-5">
+                <div class="row">
+                  {% for address in address%}
+              <div class="card  ml-4" style="width: 18rem;">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ address.fname}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ address.country}},{{ address.state}}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ address.pincode}}</h6>
+                    <p class="card-text">{{ address.address }}</p>
+                    <a href="#" class="card-link">Edit</a>
+                    <a href="#" class="card-link">Delete</a>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              </div>
+            </div>
+           
+            
+               
+
+                
+                
+            </div>
+        </div>
+    </div>
+    <!-- Cart End -->
+
+
+    {% include 'customerapp/includes/footer.html' %}
+
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'customerapp/base.html' %}
+{% block content %}
+
+    <!-- Topbar Start -->
+ 
+        
+        {% include 'customerapp/includes/topnav.html' %}
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid">
+        <div class="row border-top px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100" data-toggle="collapse" href="#navbar-vertical" style="height: 65px; margin-top: -1px; padding: 0 30px;">
+                    <h6 class="m-0">Categories</h6>
+                    <i class="fa fa-angle-down text-dark"></i>
+                </a>
+                {% include 'customerapp/includes/navdrop.html' %}
+            </div>
+            <div class="col-lg-9">
+                {% include 'customerapp/includes/navbar.html' %}
+            </div>
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+
+
+
+
+    <!-- Page Header Start -->
+    <div class="container-fluid bg-secondary mb-5">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+            <h1 class="font-weight-semi-bold text-uppercase mb-3">Your Orders</h1>
+            <div class="d-inline-flex">
+                <p class="m-0"><a href="">Home</a></p>
+                <p class="m-0 px-2">-</p>
+                <p class="m-0">Your Orders</p>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+    {% for message in messages %}
+    <div class=" container alert alert-success" role="alert">
+        <h3 class="text-center">{{ message }}</h3>
+      </div>
+      {% endfor %}
+    <!-- Cart Start -->
+    {% if not orders %}
+<h2 class="text-center"> You have no orders</h2>
+<div class="text-center mt-5">
+<a class="btn btn-primary " href="{% url 'store' %}">Continue Shopping</a>
+</div>
+{% else %}
+        <div class="row px-xl-5">
+            <div class="col-md-12 table-responsive mb-5">
+                <table class="table table-bordered text-center mb-0 text-center">
+                    <thead class="bg-secondary text-dark">
+                        <tr>
+                            <th>Ordered Date</th>
+                            <th>Payment Mode</th>
+                            <th>Total Price</th>
+                            <th>Shipping Address</th>
+                            <!-- <th>Status</th> -->
+                            <th>Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                        {% for order in orders %}
+                        <tr>
+                            <td class="align-middle">{{ order.created_at }}</td>
+                            <td class="align-middle">{{ order.payment_mode }}</td>
+                            <td class="align-middle">{{ order.total_price }}</td>
+                            <td class="align-middle">
+                            {{ order.address.address }},{{ order.address.state }},{{ order.address.country }}
+                            </td>
+                            <!-- <td class="align-middle">{{ order.status }}</td> -->
+                            <td class="align-middle"> <a href="{% url 'orderview' order.id %}"> <button class="btn btn-sm btn-primary">View</button></a></td>
+                        </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+            </div>
+{% endif %}
+    <!-- Footer Start -->
+    
+    <!-- Footer End -->
+
+
+   
+
+    {% include 'customerapp/includes/footer.html' %}
+{% endblock %}

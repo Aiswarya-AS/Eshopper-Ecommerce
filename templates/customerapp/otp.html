@@ -1,0 +1,35 @@
+{% load widget_tweaks %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>RegistrationForm_v10 by Colorlib</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- LINEARICONS -->
+    <link rel="stylesheet" href="{% static 'fonts/linearicons/style.css' %}">
+    
+    <!-- STYLE CSS -->
+    <link rel="stylesheet" href="{% static 'css/signup.css'%}">
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="inner">
+            
+    <form action="{% url 'verify-otp' %}" method="POST">
+        {% csrf_token %}
+        <h3>Enter OTP</h3>
+    <input type="text" class="form-control" name='otp' placeholder="Otp">
+    <button type="submit">Login</button>
+</form>
+</div>
+        
+</div>
+
+<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'js/signup_main.js' %}"></script>
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
