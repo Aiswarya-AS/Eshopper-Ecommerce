@@ -46,9 +46,9 @@
 </div>
 {% else %}
     <!-- Cart Start -->
-    <div class="container-fluid pt-5">
+    <div class="container-fluid pt-5 ">
         <div class="row px-xl-5">
-            <div class="col-lg-8 table-responsive mb-5">
+            <div class="col-lg-8 table-responsive mb-5 ">
                 <table class="table table-bordered text-center mb-0">
                     <thead class="bg-secondary text-dark">
                         <tr>
@@ -66,23 +66,27 @@
                             <td class="align-middle"> <div class="float-left"> <img src="{{ cart_item.product.img1.url }}" alt="" style="width: 50px;">  {{ cart_item.product.product_name }} </div> </td>
                             <td class="align-middle">{{ cart_item.product.price }}</td>
                             <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <a href="{% url 'remove_from_cart' cart_item.product.id %}  "><button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button></a>
+
+
+                                    <div class="product-data">
+                                        {% csrf_token %}
+                                        <input type="hidden" class="product_id" name="product_id "value="{{ cart_item.product.id }}">
+                                        <div class="input-group quantity mr-3" style="width: 130px;">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-primary  changeQuantity btn-minus decrement-btn" >
+                                                <i class="fa fa-minus"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" class="form-control bg-secondary text-center quantity-input" value="{{ cart_item.quantity }}">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-primary btn-plus  changeQuantity increment-btn">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
 
 
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="{{ cart_item.quantity }}">
-                                    
-                                    <div class="input-group-btn">
-
-                                       <a href="{% url 'add_to_cart' cart_item.product.id %}"><button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button></a> 
-                                    </div>
-                                </div>
                             </td>
                             <td class="align-middle">{{ cart_item.sub_total }}</td>
                             <td class="align-middle"><a href="#myModal" class="trigger-btn" data-toggle="modal"> <button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></a></td>
@@ -154,5 +158,10 @@
 
 {% endif %}
     {% include 'customerapp/includes/footer.html' %}
-
+    <!-- <script type="text/javascript">
+        setTimeout(function(){
+          location.reload(true);
+         
+        },1000);
+    </script> -->
 {% endblock %}

@@ -12,15 +12,10 @@ class Order(models.Model):
     payment_mode=models.CharField(max_length=150,null=False)
     payment_id=models.CharField(max_length=250,null=True)
 
-    # choices=(
-    #     ('Pending','Pending'),
-    #     ('Out For Shipping','Out For Shipping'),
-    #     ('Out For Delivary','Out For Delivary'),
-    # )
-
-    status=models.CharField(max_length=150,default='Pending')
+    status=models.CharField(max_length=150,default='Placed')
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at_at=models.DateTimeField(auto_now=True)
+    
 
 
 class OrderItem(models.Model):
@@ -28,5 +23,6 @@ class OrderItem(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
     price=models.FloatField(null=False)
     quantity=models.IntegerField(null=False)
-    status=models.CharField(max_length=150,default='Pending')
+    status=models.CharField(max_length=150,default='Order Placed')
+    
     

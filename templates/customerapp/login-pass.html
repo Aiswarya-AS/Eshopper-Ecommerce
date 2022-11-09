@@ -36,8 +36,11 @@
                 <button type="submit">
                     Login
                 </button>
+                <div class="" style="padding-top: 2rem;">
+                    <h4> <a style="padding:5rem;padding-top:2rem;color:black;" href="{% url 'login-page' %}"> Login with OTP</a></h4>
+                 </div>
                 {% for message in messages %}
-                    <p  style="color: red;padding-top:1rem;padding-left:2rem;">{{message}}</p>
+                    <p  style="color: red;padding-top:1rem;padding-left:3rem;">{{message}}</p>
             {% endfor %}
             
             </form>

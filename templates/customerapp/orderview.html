@@ -58,11 +58,16 @@
                             <td class="align-middle">{{ order_item.quantity }}</td>
                             <td class="align-middle" style="color: red;">{{ order_item.status }}</td>
                             
-                            {% if order_item.status == 'Order Cancelled' %}
-                            <td class="align-middle"> <a href="#myModal" class="trigger-btn" data-toggle="modal"> <button disabled class="btn btn-sm btn-primary " >Cancel Order</button></a></td>
+                            {% if order_item.status == 'Delivered' %}
+                            <td class="align-middle"> <a href="#myModal2" class="trigger-btn" data-toggle="modal"> <button  class="btn btn-sm btn-primary " >Return</button></a></td>
 
-                            {% else %}
+                            {% elif order_item.status == 'Requested For Return' or order_item.status == 'Refund Initiated' %}
+                            <td class="align-middle"> <a href="#myModal" class="trigger-btn" data-toggle="modal"> <button disabled class="btn btn-sm btn-primary">Return Order</button></a></td>
+                            {% elif order_item.status != 'Order Cancelled' %}
                             <td class="align-middle"> <a href="#myModal" class="trigger-btn" data-toggle="modal"> <button class="btn btn-sm btn-primary">Cancel Order</button></a></td>
+                            {% else %}
+                            <td class="align-middle"> <a href="#myModal" class="trigger-btn" data-toggle="modal"> <button disabled class="btn btn-sm btn-primary">Cancel Order</button></a></td>
+
                             {% endif %}
                         </tr>
                         <!-- modal -->
@@ -84,10 +89,34 @@
                                 </div>
                             </div>
                         </div> 
+
+                        
+                        <div id="myModal2" class="modal fade">
+                            <div class="modal-dialog modal-confirm">
+                                <div class="modal-content">
+                                    <div class="modal-header flex-column">
+                    
+                                        <h4 class="modal-title w-100">Are you sure?</h4>	
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Do you really want return this? This process cannot be undone.</p>
+                                    </div>
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <a href="{% url 'return_order' order_item.id %}"> <button class="btn btn-sm btn-primary">Return order</button></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
                         {% endfor %}
+
                         
                     </tbody>
                 </table>
+                <div class="mt-5 float-right">
+                    <a href="{% url 'generateinvoice' orders.id %}"> <button class="btn btn-sm btn-primary">Download Invoice</button></a>
+                </div>
             </div>
             </div>
 
@@ -99,4 +128,10 @@
    
 
     {% include 'customerapp/includes/footer.html' %}
+    <!-- <script type="text/javascript">
+        setTimeout(function(){
+          location.reload(true);
+          alert("5 Seconds has passed! The page will now refresh");
+        }, 5000);
+    </script> -->
 {% endblock %}

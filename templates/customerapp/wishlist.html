@@ -220,7 +220,6 @@
                             <div class="card-footer d-flex justify-content-between bg-light border">
                                 
                                 <a href="{{ w.get_url }}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
-                                <a href="{% url 'add_to_cart' w.id %}" class="btn btn-sm text-dark p-0"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
                             </div>
                             <div class="card-footer d-flex justify-content-between bg-light border">
                                 <a href="{% url 'add_to_wishlist' w.id %}" class="btn btn-sm text-dark pl-5">Remove From Wishlist</a>
@@ -306,5 +305,5 @@
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
-
+    
 {% endblock %}

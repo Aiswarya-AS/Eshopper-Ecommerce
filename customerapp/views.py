@@ -1,7 +1,5 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render,redirect
-from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from accounts.models import CustomUser
 from carts.models import CartItem
 from category.models import Category, Product, Subcategory
@@ -11,10 +9,10 @@ from django.contrib import messages
 import random
 from twilio.rest import Client
 from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
-from django.contrib.auth.decorators import login_required
+
 from carts.views import _cart_id
 from carts.models import Cart,CartItem
-from django.views.decorators.cache import cache_control
+
 from django.views.decorators.cache import never_cache
 # Create your views here.
 def user_register(request):
@@ -25,12 +23,10 @@ def user_register(request):
         if form.is_valid():
             phone=request.POST.get('phone')
             print(phone)
-            
-            
             user=form.save()
-            login(request,user)
-            messages.success(request,"Account Created !")
-            return redirect('home')
+            return redirect('login-page')
+            # messages.success(request,"Account Created !")
+            # return redirect('home')
     return render(request,'customerapp/register.html',{
         'form':form
     })
@@ -42,12 +38,13 @@ def user_register(request):
 #     else:
 #         return redirect('admin-login')
 
-@cache_control(no_cache=True,must_revalidate=True,no_store=True)
+
 @never_cache
 def home(request):
     # if request.user.is_authenticated:
     #     return redirect(home)
-    
+    if request.user.is_superuser:
+        return redirect('adminlogin')
     category=Category.objects.all()
     subcategory=Subcategory.objects.all()
     trendy=Product.objects.all()[:4]
@@ -59,7 +56,7 @@ def home(request):
     })
 
 
-@cache_control(no_cache=True,must_revalidate=True,no_store=True)
+
 def user_logout(request):
     logout(request)
     return redirect('login-pass')
@@ -72,7 +69,7 @@ def store(request,subcategory_slug=None):
     if subcategory_slug!=None:
         subcategories=get_object_or_404(Subcategory,slug=subcategory_slug)
         products=Product.objects.filter(subcategory=subcategories,)
-        paginator=Paginator(products,1)
+        paginator=Paginator(products,2)
         page=request.GET.get('page')
         paged_products=paginator.get_page(page)
     else:
@@ -126,6 +123,8 @@ def search(request):
 
 
 def login_otp(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method =='GET':
         phone=request.GET.get('phone')
         print(phone)
@@ -133,10 +132,16 @@ def login_otp(request):
         return redirect('otp')
     
 def login_page(request):
+    if request.user.is_superuser:
+        return redirect('adminlogin')
+    if request.user.is_authenticated:
+        return redirect('home')
     return render(request,'customerapp/login-otp.html')
 
 
 def otp(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     return render(request,'customerapp/otp.html')
 
 
@@ -167,7 +172,7 @@ class OtpGenerate():
 
     def send_otp(phone):
         account_sid='AC9315825af374025a0a2827c4d28ddf85'
-        auth_token='08cfbb15ef72bda7ff01a9bf81609cde'
+        auth_token='01d2740881c46c03f2c129903e0d0682'
         target_number = '+91' + phone
         twilio_number='+12134680849'
         otp=random.randint(1000,9999)
@@ -184,14 +189,21 @@ class OtpGenerate():
         return True
 
 
-@cache_control(no_cache=True,must_revalidate=True,no_store=True)
+
+@never_cache
 def login_pass(request):
+    if request.user.is_superuser:
+        return redirect('adminlogin')
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method=='POST':
         email=request.POST.get('email')
         password=request.POST.get('password')
         user=authenticate(email=email,password=password)
         
-        if user is not None:
+        
+        if user is not None and user.blocked==False:
+
             if user.is_superuser==False:
                 try:
                     
@@ -233,3 +245,8 @@ def user_wishlist(request):
     return render(request,'customerapp/wishlist.html',{
         'wishlist':products
     })
+
+
+
+def my_profile(request):
+    return render(request,'customerapp/my_profile.html')

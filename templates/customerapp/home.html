@@ -5,7 +5,11 @@
 {% include 'customerapp/includes/topnav.html' %}
 <!-- Topbar End -->
 
-
+{% for message in messages %}
+<div class=" container alert alert-success" role="alert">
+    <h3 class="text-center">{{ message }}</h3>
+  </div>
+  {% endfor %}
 <!-- Navbar Start -->
 <div class="container-fluid mb-5">
 <div class="row border-top px-xl-5">
