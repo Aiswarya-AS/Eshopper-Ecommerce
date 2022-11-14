@@ -32,6 +32,19 @@ urlpatterns = [
 
     path('orders/',views.orders,name='orders'),
     path('order_items/',views.order_items,name='order_items'),
-    path('order_delete/',views.order_delete,name='order_delete'),
-    path('order_item_delete/',views.order_item_delete,name='order_item_delete'),
+
+
+
+    path('add_size/',views.add_size,name='add_size'),
+    path('add_color/',views.add_color,name='add_color'),
+    path('variations/',views.variations,name='variations'),
+    path('add_variations/<int:id>/',views.add_variations,name='add_variations'),
+    path('load_size/',views.load_size,name='load_size'),
+
+
+    path('product_report/',views.product_report,name='product_report'),
+    path('sales_report/',views.sales_report,name='sales_report'),
+    path('product_csv/',views.product_csv,name='product_csv'),
+    path('generateProductPdf',views.generateProductPdf.as_view(),name='generateProductPdf'),
+    path('product_excel',views.product_excel,name='product_excel')
 ]

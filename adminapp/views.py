@@ -1,4 +1,5 @@
-from ast import Sub
+from django.utils import timezone
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from accounts.models import CustomUser
@@ -7,12 +8,74 @@ from django.utils.text import slugify
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from orders.models import Order,OrderItem
+from django.db.models import Sum
+import datetime
+from django.db.models import Count,Q
+import csv
+from django.template.loader import render_to_string
+
+from io import BytesIO
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+from django.views.generic import View
+from django.template.loader import get_template
+import xlwt
+
 # Create your views here.
 
 @login_required(login_url='adminlogin')
 def admin_home(request):
     if request.user.is_superuser==True:
-        return render(request,'adminapp/dashboard.html')
+        total_users=CustomUser.objects.filter(is_active=True).count()
+        total_products=Product.objects.filter(is_available=True).count()
+        total_orders=Product.objects.filter().count()
+        total_revenue=Order.objects.aggregate(Sum('total_price'))
+
+        current_year=timezone.now().year
+        order_detail=OrderItem.objects.filter(created_at__lt=datetime.date(current_year,12,31),status="Delivered")
+        monthly_order_count=[]
+        month=timezone.now().month
+        for i in range(1,month+2):
+            monthly_order = order_detail.filter(created_at__month=i).count()
+            monthly_order_count.append(monthly_order)
+        
+
+        today=datetime.datetime.now()
+        dates=OrderItem.objects.filter(created_at__month=today.month).values('created_at__date').annotate(order_items=Count('id')).order_by('created_at__date')
+        returns=OrderItem.objects.filter(created_at__month=today.month).values('created_at__date').annotate(returns=Count('id',filter=Q(status='Cancelled')|Q(status='Return Initiated'))).order_by('created_at__date')
+        sales=OrderItem.objects.filter(created_at__month=today.month).values('created_at__date').annotate(returns=Count('id',filter=Q(status='Delivered'))).order_by('created_at__date')
+        
+        most_moving_product_count=[]
+        most_moving_product=[]
+        
+        products=Product.objects.all()
+        for i in products:
+            most_moving_product.append(i)
+            most_moving_product_count.append(
+                OrderItem.objects.filter(
+                    product=i,status='Delivered'
+                ).count()
+            )
+        print(most_moving_product)
+        print(most_moving_product_count,'...................')
+        
+
+        
+        return render(request,'adminapp/dashboard.html',{
+            
+            'total_orders':total_orders,
+            'total_products':total_products,
+            'total_users':total_users,
+            'total_revenue':total_revenue,
+            "monthly_order_count": monthly_order_count,
+            'today':today,
+            'sales':sales,
+            'returns':returns,
+            'dates':dates,
+            'most_moving_product':most_moving_product,
+            'most_moving_product_count':most_moving_product_count
+
+        })
 
 
 @login_required(login_url='adminlogin')
@@ -258,15 +321,204 @@ def orders(request):
     return render(request,'adminapp/orders.html',context)
 
 def order_items(request):
-    order_items=OrderItem.objects.all()
+    order_items=OrderItem.objects.all()[::-1]
     context={
         
         'order_items':order_items
     }
     return render(request,'adminapp/orderitems.html',context)
 
-def order_delete(request):
-    pass
+def variations(request):
+    color=Color.objects.all()
+    return render(request,'adminapp/variations.html',{
+        'color':color
+        })
 
-def order_item_delete(request):
-    pass
+
+from category.models import Color,Size,Variations
+def add_color(request):
+    if request.method=='POST':
+        color=request.POST.get('color')
+        if Color.objects.filter(color_value=color).exists():
+            messages.error(request,"already exists")
+            return redirect('variations')
+        else:
+            c=Color()
+            c.color_value=color
+            c.save()
+            messages.success(request,'added new color')
+            return redirect('variations')
+
+def add_size(request):
+    if request.method=="POST":
+        seccolor=request.POST.get('selectcolor')
+        
+        size=request.POST.get('size')
+        
+        if Size.objects.filter(color=seccolor,size_value=size).exists():
+            messages.error(request,"already exists")
+            return redirect('variations')
+        else:
+            s=Size()
+            s.color_id=seccolor
+            s.size_value=size
+            s.save()
+            messages.success(request,'added new size')
+    
+    
+            return redirect('variations')
+
+def add_variations(request,id):
+    product=Product.objects.get(id=id)
+    print(product,"??????????????????????????????????")
+    colors=Color.objects.all()
+
+    if request.method=="POST":
+        c=request.POST.get('selectcolor')
+        s=request.POST.get('selectsize')
+        vari=Variations()
+        if variations.objects.get(product=product,color=c,size=s).exists():
+            messages.error(request,'Already Exists')
+            return redirect('add_variations')
+        vari.product_id=product.id
+        vari.color_id=c
+        vari.size_id=s
+        vari.save()
+        messages.success(request,'added')
+    return render(request,'adminapp/add_variations.html',{
+        
+        'colors':colors,
+        'product':product
+    })
+
+
+def load_size(request):
+    color=request.GET.get('color_id')
+
+    size=Size.objects.filter(color=color).all()
+    return render(request,'adminapp/sizedropdown.html',{
+        'size':size
+    })
+
+def product_report(request):
+    products=Product.objects.all()
+    
+
+    if request.GET.get('product_from'):
+        product_date_from=datetime.datetime.strptime(request.GET.get('product_from'),"%Y-%m-%d")
+        product_date_to=datetime.datetime.strptime(request.GET.get('product_to'),"%Y-%m-%d")
+
+        product_date_to+=datetime.timedelta(days=1)
+        products=Product.objects.filter(added_date__range=[product_date_from,product_date_to])
+
+    
+        
+    return render(request,'adminapp/product_report.html',{
+        'products':products,
+        
+    })
+
+def sales_report(request):
+    products=Product.objects.all()
+    
+    order_items=OrderItem.objects.all().order_by('-created_at')
+
+    if request.GET.get('sales_from'):
+        sales_date_from=datetime.datetime.strptime(request.GET.get('sales_from'),"%Y-%m-%d")
+        sales_date_to=datetime.datetime.strptime(request.GET.get('sales_to'),"%Y-%m-%d")
+
+        sales_date_to+=datetime.timedelta(days=1)
+        order_items=OrderItem.objects.filter(created_at__range=[sales_date_from,sales_date_to])
+        
+        
+    return render(request,'adminapp/sales_report.html',{
+        'products':products,
+        'order_items':order_items
+    })
+
+
+def product_csv(request):
+    response=HttpResponse(content_type='text/csv')
+    response[
+        "Content-Disposition"
+    ] = "attachement; filename=Product_Report.csv"
+
+    writer=csv.writer(response)
+    writer.writerow(
+        [
+            "Product Name",
+            "Category Name",
+            "Subcategory Name",
+            "Price"
+            "Stock"
+        ]
+    )
+    products=Product.objects.all().order_by('id')
+    for p in products:
+        writer.writerow(
+            [
+                p.product_name,
+                p.category.cat_name,
+                p.subcategory.sub_name,
+                p.price,
+                p.stock,
+            ]
+        )
+    return response
+
+
+class generateProductPdf(View):
+    def get(self,request,*args,**kwargs):
+        try:
+            products=Product.objects.all()
+            
+        except:
+            return HttpResponse("505 not found")
+        data={
+            'products':products
+        }
+        pdf=render_to_pdf('adminapp/product_pdf.html',data)
+        return HttpResponse(pdf,content_type='application/pdf')
+
+def render_to_pdf(template_src,context_dict={}):
+    template=get_template(template_src)
+    html=template.render(context_dict)
+    result=BytesIO()
+    pdf=pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")),result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(),content_type='application/pdf')
+    return None
+
+def product_excel(request):
+    response=HttpResponse(content_type='application/ms-excel')
+    response[
+        "Content-Disposition"
+    ] = "attachement; filename=Product_Report.xls"
+    wb=xlwt.Workbook(encoding='utf-8')
+    ws=wb.add_sheet('Product_Data')
+    row_num=0
+    font_style=xlwt.XFStyle()
+    font_style.font.bold=True
+
+    columns=[
+            "Product Name",
+            "Category Name",
+            "Subcategory Name",
+            "Price"
+            "Stock"
+    ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num,col_num,columns[col_num],font_style)
+
+    font_style=xlwt.XFStyle()
+    rows=Product.objects.all().values_list('product_name','category','subcategory','price','stock')
+
+    for row in rows:
+        row_num+=1
+
+        for col_num in range(len(row)):
+            ws.write(row_num,col_num,str(row[col_num]),font_style)
+
+    wb.save(response)
+    return response

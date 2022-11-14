@@ -23,6 +23,7 @@ urlpatterns = [
     path('add_to_wishlist/<int:id>/',views.add_to_wishlist,name='add_to_wishlist'),
     path('user_wishlist/',views.user_wishlist,name="user_wishlist"),
     path('my_profile/',views.my_profile,name="my_profile"),
+    path('load_size_user/',views.load_size_user,name="load_size_user"),
 
 
    

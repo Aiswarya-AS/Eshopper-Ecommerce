@@ -24,5 +24,6 @@ class OrderItem(models.Model):
     price=models.FloatField(null=False)
     quantity=models.IntegerField(null=False)
     status=models.CharField(max_length=150,default='Order Placed')
+    created_at=models.DateTimeField(auto_now_add=True)
     
     

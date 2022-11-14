@@ -229,26 +229,27 @@
                               {% endif %}
                             {% elif o.status != "Refund Initiated" %}
                               <select onchange="order_status_change(event,'{{o.id}}')" style="border-color: rgb(124, 121, 121);width:7.5rem;height:2rem;border-radius:.5rem;" name="" id="order_status">
-                                <option value="">{{ o.status }}</option>
-                                {% if o.status != 'Placed' %}
-                                <option value="Placed">Placed</option>
-                                {% endif %}
-
-                                {% if o.status != 'Accepted' %}
-                                <option value="Accepted">Accepted</option>
-                                {% endif %}
-
-                                {% if o.status != 'Shipped' %}
+                                <option selected value="{{ o.id }}" >{{ o.status }}</option>
+                                
+                                 {% if o.status == 'Order Placed' %}
                                 <option value="Shipped">Shipped</option>
-                                {% endif %}
-
-                                {% if o.status != 'Delivered' %}
                                 <option value="Delivered">Delivered</option>
-                                {% endif %}
-
-                                {% if o.status != 'Cancelled' %}
                                 <option value="Cancelled">Cancelled</option>
-                                {% endif %}
+                               
+                                {% elif o.status == 'Shipped' %}
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                                
+
+                                {% elif o.status == 'Delivered' %}
+                                <option value="Cancelled">Cancelled</option>
+
+                                {% elif o.status == 'Cancelled' %}
+                                  <option value=""></option>
+                                {% endif %} 
+
+                                
+
                               </select>
                             {% endif %}
                           </td>
@@ -284,6 +285,7 @@
   </div>
 
 <script>
+  
   function order_status_change(event, order_id){
     status = event.target.value
     id = order_id
@@ -302,5 +304,7 @@
         }
     })
 }
+
+
 </script>
   {% endblock %}

@@ -71,10 +71,13 @@
             <button disabled class="btn btn-primary btn-lg" style="width:21.5rem;" type="submit">Cash On Delivary  </button>
 
             {% else %}
-              <button class="btn btn-primary btn-lg" style="width:22.5rem;" type="submit">Cash On Delivary  </button>
               
-              <button class="btn btn-primary btn-lg mt-2 payWithRazorpay" style="width:22.5rem;" type="button">Pay With Razorpay  </button>
-
+                <div class="mt-2 text-center">
+                  <button class="btn btn-primary btn-lg" style="width:21.2rem;" type="submit">Cash On Delivary  </button>
+              
+                  <button class="btn btn-primary btn-lg mt-2 mb-2 payWithRazorpay" style="width:21.2rem;" type="button">Pay With Razorpay  </button>
+                  <div id="paypal-button-container"></div>
+                </div>
               {% endif %}
               {% else %}
                   <h2 class="text-center"> Your cart is Empty</h2>
@@ -130,6 +133,79 @@
       <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
       <script src="{% static '/js/checkout.js' %}"></script>
+
+
+      {% block scripts %}
+      <script src="https://www.paypal.com/sdk/js?client-id=AZ52qvfMslohQsWKKcQkBKSwDljMb_4WxlEyrS-Msb5-ngFD0p0vGN48U-HgFi0tkCSVFhAivRhtMKm0&currency=USD&components=buttons,marks&disable-funding=credit,card"></script>
+
+      <script>
+        paypal.Buttons({
+          style: {
+            
+            color:   'black',
+            
+          },
+          // Sets up the transaction when a payment button is clicked
+          onClick:function(data,actions){
+            var address=$(".address:checked").val();
+            var token=$('input[name=csrfmiddlewaretoken]').val();
+            console.log(address)
+            if (address == undefined){
+                
+                swal("Alert", "All Fields are required", "error");
+                return false;
+            }
+            else{
+              return true;
+            }
+
+          },
+          createOrder: (data, actions) => {
+            return actions.order.create({
+              purchase_units: [{
+                amount: {
+                  value: '0.01' // Can also reference a variable or function
+                }
+              }]
+            });
+          },
+          // Finalize the transaction after payer approval
+          onApprove: (data, actions) => {
+            return actions.order.capture().then(function(orderData) {
+              // Successful capture! For dev/demo purposes:
+              console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+              alert(orderData.id);
+              //const transaction = orderData.purchase_units[0].payments.captures[0]; -->
+              //alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
+              // When ready to go live, remove the alert and show a success message within this page. For example:
+              // const element = document.getElementById('paypal-button-container');
+              // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+              // Or go to another URL:  actions.redirect('thank_you.html');
+              var address=$(".address:checked").val();
+              var token=$('input[name=csrfmiddlewaretoken]').val();
+              data={
+                'address':address,
+                "payment_mode":"Paypal",
+                'payment_id': orderData.id,
+                csrfmiddlewaretoken:token
+            }
+            $.ajax({
+                method: "POST",
+                url: "/orders/place_order/",
+                data: data,
+                success: function (responsec) {
+                    swal("Congrats",responsec.status).then((value) => {
+                        window.location.href='/orders/order_summary/'
+                    });
+                    
+                    
+                }
+            });
+            });
+          }
+        }).render('#paypal-button-container');
+      </script>
+      {% endblock %}
       
     <!-- Optional JavaScript; choose one of the two! -->
 

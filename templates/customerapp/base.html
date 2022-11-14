@@ -33,7 +33,11 @@
 {% block content %}
 {% endblock %}
 
+
+
+
 <script src="{% static '/js/jquery-3.6.1.min.js' %}"></script>
+
 <script src="{% static '/js/custom.js' %}"></script>
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -48,7 +52,9 @@
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
+    {% block scripts %}
 
+    {% endblock  %}
    
 </body>
 

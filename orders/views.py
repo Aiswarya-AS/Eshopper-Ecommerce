@@ -76,7 +76,7 @@ def place_order(request):
         
 
         pay_mode=request.POST.get('payment_mode')
-        if(pay_mode=="Razorpay"):
+        if(pay_mode=="Razorpay" or pay_mode=="Paypal"):
             return JsonResponse({'status':"Your order has been placed Succesfully"})
 
     
@@ -124,9 +124,15 @@ def return_order(request,id):
     return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 def accept_return(request,id):
+    
     order_item=OrderItem.objects.get(id=id)
+    
     order_item.status="Refund Initiated"
+    product_id=order_item.product_id
+    product=Product.objects.get(id=product_id)
+    product.stock+=order_item.quantity
     order_item.save()
+    product.save()
     return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
 

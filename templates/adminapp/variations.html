@@ -1,8 +1,8 @@
-{% extends 'adminapp/base.html' %}
-{% load static %}
+
+{% extends 'adminapp/base.html'%}
 {% block content %}
   <div class="container-scroller">
-
+    <!-- partial:../../partials/_navbar.html -->
     {% include 'adminapp/includes/top-nav.html' %}
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
@@ -176,76 +176,77 @@
         </div>
       </div>
       <!-- partial -->
-      <!-- partial:../../partials/_sidebar.html -->
-      {% include 'adminapp/includes/navbar.html' %}
+ {% include 'adminapp/includes/navbar.html' %}
+
+
       <!-- partial -->
-
-
-      <div class="main-panel">
+      <div class="main-panel">        
         <div class="content-wrapper">
+            {% for c in messages %}
+            {{c}} {% endfor %}
           <div class="row">
-            {% for message in messages %}
-              
-              <h3 class="m-3">{{ message }}</h3>
-            {% endfor %}
-            <div class="col-lg-6 grid-margin stretch-card">
+            <div class="col md-6">
+            <div class="col-md-6 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Add Color</h4>
+                  
+                  <form class="forms-sample" method="POST" action="{% url 'add_color' %}">
+                    {% csrf_token %}
+                    <div class="form-group row"style="height:6rem;">
+                      <label for="exampleInputUsername2" class="col-sm-3 col-form-label mt-4">Color</label>
+                      <div class="col-sm-9 mt-4" >
+                        <input type="text" name="color" class="form-control" id="exampleInputUsername2" placeholder="Color" required>
+                      </div>
+                    </div>
+                    
+                    
+                    
+                    
+                    <button type="submit" class="btn btn-primary me-2">Submit</button>
+                    
+                  </form>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="col-md-6 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
-                    <h4 class="card-title text-center">Category Table</h4>
-                    <p class="card-description">
-                        <a href="{% url 'addcategory' %}"><button type="button" class="btn btn-dark btn-md btn-block float-right">Add Category</button></a> 
+                    <h4 class="card-title">Add size</h4>
+                    
+                    <form class="forms-sample" method="POST" action="{% url 'add_size' %}">
+                      {% csrf_token %}
+                      <div class="form-group row"style="height:6rem;">
+                        <div>
+                            <label for="exampleInputUsername2" class="col-sm-3 col-form-label">color</label>
 
-                    </p>
-                    <div class="table-responsive">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>SL NO</th>
-                            <th>ID</th>
-                            <th>Name</th>
-                            
-                            <th class="text-center">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            {% for c in categories %}
-                          <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ c.id }}</td>
-                            <td>{{ c.cat_name }}</td>
-                            <td> 
-                                <a href="{% url 'editcategory' c.id %}"><button type="submit" class="btn btn-dark ">Edit</button> </a>
-                                <button onclick="deletepop()" type="button" class="btn btn-danger mx-2">Delete</button> </td>
-                          </tr>
-                          <!-- <div id="myModal" class="modal fade">
-                            <div class="modal-dialog modal-confirm">
-                                <div class="modal-content">
-                                    <div class="modal-header flex-column">
-                                    
-                                        <h4 class="modal-title w-100">Are you sure?</h4>	
-                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Do you really want to delete these records? This process cannot be undone.</p>
-                                    </div>
-                                    <div class="modal-footer justify-content-center">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                        <a href="{% url 'deletecategory' c.id %}"><button type="button" class="btn btn-danger mx-2">Delete</button></a> 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>  -->
-
-                          {% endfor %}
-                        </tbody>
-                      </table>
-                    </div>
+                            <select name="selectcolor" id="selectcolor" required>
+                                <option selected="selected" disabled>Categories:</option>
+                                {% for c in color %}
+                                <option value="{{ c.id }}">{{ c.color_value }}</option>
+                                {% endfor %}
+                              </select>
+                        </div>
+                        <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Size</label>
+                        <div class="col-sm-9">
+                          <input type="text" name="size" class="form-control" id="exampleInputUsername2" placeholder="Size" required>
+                        </div>
+                      </div>
+                      
+                      
+                      
+                      
+                      <button type="submit" class="btn btn-primary me-2">Submit</button>
+                      
+                    </form>
                   </div>
                 </div>
-              </div>    
+              </div>
+        </div>
 
             
-        
           </div>
         </div>
         <!-- content-wrapper ends -->
@@ -262,5 +263,5 @@
     </div>
     <!-- page-body-wrapper ends -->
   </div>
-  
+  <!-- container-scroller -->
  {% endblock %}

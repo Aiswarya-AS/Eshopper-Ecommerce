@@ -83,12 +83,13 @@ def store(request,subcategory_slug=None):
         'products':paged_products
     })
 
-
+from category.models import Variations
 def product_detail(request,subcategory_slug,product_slug):
     category=Category.objects.all()
     
     try:
-        single_product=Product.objects.get(subcategory__slug=subcategory_slug,slug=product_slug)
+        single_product=Product.objects.get(subcategory__slug=subcategory_slug,slug=product_slug) 
+        variation=Variations.objects.filter(product=single_product.id)
         in_cart=CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
         
         
@@ -101,6 +102,7 @@ def product_detail(request,subcategory_slug,product_slug):
         'single_product':single_product,
         'category':category,
         'in_cart':in_cart,
+        'variation':variation
         
     })
 
@@ -250,3 +252,12 @@ def user_wishlist(request):
 
 def my_profile(request):
     return render(request,'customerapp/my_profile.html')
+from category.models import Size
+def load_size_user(request):
+    print("loaded this function................................................................")
+    color=request.GET.get('color_id')
+
+    size=Size.objects.filter(color=color).all()
+    return render(request,'customerapp/user-size-dropdown.html',{
+        'size':size
+    })
