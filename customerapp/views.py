@@ -61,21 +61,27 @@ def user_logout(request):
     logout(request)
     return redirect('login-pass')
 
-def store(request,subcategory_slug=None):
+def store(request,category_slug=None,subcategory_slug=None):
     category=Category.objects.all()
     subcategories=None
     products=None
-
-    if subcategory_slug!=None:
+    categories=None
+    if category_slug!=None:
+        categories=get_object_or_404(Category,slug=category_slug)
+        products=Product.objects.filter(category=categories)
+        paginator=Paginator(products,2)
+        page=request.GET.get('page')
+        paged_products=paginator.get_page(page)
+    elif category_slug and subcategory_slug!=None:
         subcategories=get_object_or_404(Subcategory,slug=subcategory_slug)
-        products=Product.objects.filter(subcategory=subcategories,)
+        products=Product.objects.filter(subcategory=subcategories,category=category_slug)
         paginator=Paginator(products,2)
         page=request.GET.get('page')
         paged_products=paginator.get_page(page)
     else:
 
         products=Product.objects.all()
-        paginator=Paginator(products,4)
+        paginator=Paginator(products,2)
         page=request.GET.get('page')
         paged_products=paginator.get_page(page)
     return render(request,'customerapp/store.html',{
@@ -84,13 +90,14 @@ def store(request,subcategory_slug=None):
     })
 
 from category.models import Variations
-def product_detail(request,subcategory_slug,product_slug):
+def product_detail(request,category_slug,subcategory_slug,product_slug):
     category=Category.objects.all()
     
     try:
-        single_product=Product.objects.get(subcategory__slug=subcategory_slug,slug=product_slug) 
+        single_product=Product.objects.get(category__slug=category_slug,subcategory__slug=subcategory_slug,slug=product_slug) 
         variation=Variations.objects.filter(product=single_product.id)
         in_cart=CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
+        
         
         
         

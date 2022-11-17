@@ -11,14 +11,20 @@ class Category(models.Model):
     cat_name=models.CharField(max_length=50,unique=True)
     slug=models.SlugField(max_length=200,unique=True)
 
+    def get_url(self):
+        return reverse('products_by_category',args=[self.slug])
+
+    def __str__(self):
+        return self.cat_name
 class Subcategory(models.Model):
     sub_name=models.CharField(max_length=50,unique=True)
     slug=models.SlugField(max_length=200,unique=True)
     parent_cat=models.ForeignKey(Category,on_delete=models.CASCADE)
 
     def get_url(self):
-        return reverse('products_by_subcategory',args=[self.slug])
-
+        return reverse('products_by_subcategory',args=[self.parent_cat.slug,self.slug])
+    def __str__(self):
+        return self.sub_name
 
 
 class Product(models.Model):
@@ -39,7 +45,7 @@ class Product(models.Model):
     
     
     def get_url(self):
-        return reverse('product_detail',args=[self.subcategory.slug,self.slug])
+        return reverse('product_detail',args=[self.category.slug,self.subcategory.slug,self.slug])
         
     def __str__(self):
         return self.product_name
@@ -48,16 +54,53 @@ class Product(models.Model):
         orderitems=apps.get_model("orders",'OrderItem')
         orders=orderitems.objects.filter(product=self,created_at__month=month,status="Delivered")
         return orders.values("product").annotate(revenue=Sum("price"))
+
     def get_profit(self,month=timezone.now().month):
         orderitems=apps.get_model("orders",'OrderItem')
         orders=orderitems.objects.filter(product=self,created_at__month=month,status="Delivered")
         calculating_profit=orders.values('product').annotate(profit=Sum('price'))
         profit=calculating_profit[0]['profit']*0.23
         return profit
+        
     def get_count(self,month=timezone.now().month):
         orderitems=apps.get_model("orders",'OrderItem')
         orders=orderitems.objects.filter(product=self,created_at__month=month,status="Delivered")
         return orders.values("product").annotate(quantity=Sum("quantity"))
+
+    def offer_price(self):
+        try:
+            if self.category.categoryoffer.is_valid:
+                offer_price=(self.price*(self.category.categoryoffer.discount) / 100)
+                new_price=self.price - offer_price
+                return {
+                    "new_price":new_price
+                }
+            raise
+        except:
+            try:
+                if self.subcategory.subcategoryoffer.is_valid:
+                    offer_price=(self.price*(self.subcategory.subcategoryoffer.discount) / 100)
+                    new_price=self.price - offer_price
+                    return {
+                        "new_price":new_price
+                    }
+                raise
+            except:
+                try:
+                    if  self.productoffer.is_valid:
+                        offer_price=(self.price*(self.productoffer.discount) / 100)
+                        new_price=self.price - offer_price
+                        return {
+                            "new_price":new_price
+                        }
+                    raise
+                except:
+                    return {
+                            "new_price":self.price
+                        }
+            
+
+
 
 class Banner(models.Model):
     banner_img1=models.ImageField(upload_to='images/banner_images',blank=True)

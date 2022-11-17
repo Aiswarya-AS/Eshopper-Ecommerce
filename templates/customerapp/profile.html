@@ -47,7 +47,7 @@
 
 
     <!-- Cart Start -->
-    <div class="container-fluid pt-5">
+    <div class="container-fluid pt-5 ml-5 ">
         <div class="row px-xl-5">
             <div class="col-lg-8 table-responsive mb-5">
              
@@ -56,17 +56,39 @@
               </div>
               <div class="container mt-5">
                 <div class="row">
-                  {% for address in address%}
-              <div class="card  ml-4" style="width: 18rem;">
+                    {% for address in address%}
+                    <div class="col-md-4">
+              <div class="card  ml-4 mt-3" style="width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">{{ address.fname}}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ address.country}},{{ address.state}}</h6>
                     <h6 class="card-subtitle mb-2 text-muted">{{ address.pincode}}</h6>
                     <p class="card-text">{{ address.address }}</p>
-                    <a href="#" class="card-link">Edit</a>
-                    <a href="#" class="card-link">Delete</a>
+                    <a href="{% url 'edit_address' address.id %}" class="card-link">Edit</a>
+                    <a href="#myModal" class="card-link" data-toggle="modal">Delete</a>
+
+                    
                   </div>
                 </div>
+                <div id="myModal" class="modal fade">
+                    <div class="modal-dialog modal-confirm">
+                        <div class="modal-content">
+                            <div class="modal-header flex-column">
+            
+                                <h4 class="modal-title w-100">Are you sure?</h4>	
+                                <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+                            </div>
+                            <div class="modal-body">
+                                <p>Do you really want to  delete the address? </p>
+                            </div>
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <a href="{% url 'delete_address' address.id %}"> <button class="btn btn-sm btn-primary">Yes</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
                 {% endfor %}
               </div>
               </div>

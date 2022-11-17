@@ -8,8 +8,9 @@ urlpatterns = [
     path('logout/',views.user_logout,name='logout_user'),
 
     path('store/',views.store,name='store'),
-    path('store/<slug:subcategory_slug>/',views.store,name='products_by_subcategory'),
-    path('store/<slug:subcategory_slug>/<slug:product_slug>/',views.product_detail,name='product_detail'),
+    path('store/<slug:category_slug>/',views.store,name='products_by_category'),
+    path('store/<slug:category_slug>/<slug:subcategory_slug>/',views.store,name='products_by_subcategory'),
+    path('store/<slug:category_slug>/<slug:subcategory_slug>/<slug:product_slug>/',views.product_detail,name='product_detail'),
 
     path('search/',views.search,name='search'),
 
@@ -28,7 +29,7 @@ urlpatterns = [
 
    
 
-
+    
 
     
 

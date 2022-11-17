@@ -1,5 +1,5 @@
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import HttpResponse, render,get_object_or_404,redirect
 from django.urls import reverse
 from userprofile.models import Address
 from .forms import UserAddressForm
@@ -27,3 +27,17 @@ def add_address(request):
     return render(request,'customerapp/add_address.html',{
         'form':address_form
     })
+def edit_address(request,id):
+    address=get_object_or_404(Address, id = id)
+    address_form=UserAddressForm(request.POST or None,instance=address)
+    if address_form.is_valid():
+        address_form.save()
+        return redirect('view_address')
+    return render(request,'customerapp/add_address.html',
+    {
+        'form':address_form
+    })
+
+def delete_address(request,id):
+    address=get_object_or_404(Address, id = id).delete()
+    return redirect('view_address')

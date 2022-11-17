@@ -21,6 +21,8 @@ from django.views.generic import View
 from django.template.loader import get_template
 import xlwt
 
+from offers.forms import CategoryOfferForm,SubcategoryOfferForm,ProductOfferForm,CouponOfferForm
+from offers.models import CategoryOffer,SubcategoryOffer,ProductOffer,Coupon
 # Create your views here.
 
 @login_required(login_url='adminlogin')
@@ -28,7 +30,7 @@ def admin_home(request):
     if request.user.is_superuser==True:
         total_users=CustomUser.objects.filter(is_active=True).count()
         total_products=Product.objects.filter(is_available=True).count()
-        total_orders=Product.objects.filter().count()
+        total_orders=OrderItem.objects.filter(status='Delivered').count()
         total_revenue=Order.objects.aggregate(Sum('total_price'))
 
         current_year=timezone.now().year
@@ -42,8 +44,8 @@ def admin_home(request):
 
         today=datetime.datetime.now()
         dates=OrderItem.objects.filter(created_at__month=today.month).values('created_at__date').annotate(order_items=Count('id')).order_by('created_at__date')
-        returns=OrderItem.objects.filter(created_at__month=today.month).values('created_at__date').annotate(returns=Count('id',filter=Q(status='Cancelled')|Q(status='Return Initiated'))).order_by('created_at__date')
-        sales=OrderItem.objects.filter(created_at__month=today.month).values('created_at__date').annotate(returns=Count('id',filter=Q(status='Delivered'))).order_by('created_at__date')
+        returns=OrderItem.objects.filter(created_at__month=today.month).values('created_at__date').annotate(returns=Count('id',filter=Q(status='Cancelled'))).order_by('created_at__date')
+        sales=OrderItem.objects.filter(created_at__month=today.month).values('created_at__date').annotate(sales=Count('id',filter=Q(status='Delivered'))).order_by('created_at__date')
         
         most_moving_product_count=[]
         most_moving_product=[]
@@ -56,8 +58,7 @@ def admin_home(request):
                     product=i,status='Delivered'
                 ).count()
             )
-        print(most_moving_product)
-        print(most_moving_product_count,'...................')
+        
         
 
         
@@ -145,7 +146,7 @@ def edit_category(request,id):
         messages.error(request,"Updated")
         return redirect('category')
     return render(request,'adminapp/edit-category.html',{
-        'cat'
+        'cat':cat
     })
 
 
@@ -205,6 +206,44 @@ def edit_subcategory(request,id):
         'categories':category,'sub':sub
     })
 
+
+def edit_product(request,id):
+    product=Product.objects.get(id=id)
+    if request.method=='POST':
+        productname=request.POST.get('productname')
+        if Product.objects.filter(product_name=productname).exists():
+            messages.error(request,'Product Name Already Exists')
+            return redirect('products')
+        
+        product.product_name=productname
+        product.slug=slugify(productname)
+        product.price=request.POST.get('price')
+        product.stock=request.POST.get('stock')
+        product.product_desc=request.POST.get('productdesc')
+        product.subcategory_id=request.POST.get('selectsubcategory')
+        
+        product.category_id=request.POST.get('selectcategory')
+
+        if 'productimage1' in request.FILES:
+            product.img1=request.FILES['productimage1']
+        if 'productimage2' in request.FILES:
+            product.img2=request.FILES['productimage2']
+        if 'productimage3' in request.FILES:
+            product.img3=request.FILES['productimage3']
+        if 'productimage4' in request.FILES:
+            product.img4=request.FILES['productimage4']
+
+        if int(product.stock) < 0:
+            product.is_available=False
+        else:
+            product.is_available=True
+        product.save()
+        messages.success(request,"New Product Added!")
+        return redirect('products')
+    
+    return render(request,'adminapp/edit-product.html',{
+        'product':product
+    })
 
 @login_required(login_url='adminlogin')
 
@@ -405,16 +444,18 @@ def product_report(request):
     
 
     if request.GET.get('product_from'):
-        product_date_from=datetime.datetime.strptime(request.GET.get('product_from'),"%Y-%m-%d")
-        product_date_to=datetime.datetime.strptime(request.GET.get('product_to'),"%Y-%m-%d")
+        product_date_from=datetime.datetime.strptime(request.GET.get('from'),"%Y-%m-%d")
+        product_date_to=datetime.datetime.strptime(request.GET.get('to'),"%Y-%m-%d")
 
         product_date_to+=datetime.timedelta(days=1)
         products=Product.objects.filter(added_date__range=[product_date_from,product_date_to])
-
+    
+    
     
         
     return render(request,'adminapp/product_report.html',{
         'products':products,
+        
         
     })
 
@@ -424,8 +465,8 @@ def sales_report(request):
     order_items=OrderItem.objects.all().order_by('-created_at')
 
     if request.GET.get('sales_from'):
-        sales_date_from=datetime.datetime.strptime(request.GET.get('sales_from'),"%Y-%m-%d")
-        sales_date_to=datetime.datetime.strptime(request.GET.get('sales_to'),"%Y-%m-%d")
+        sales_date_from=datetime.datetime.strptime(request.GET.get('from'),"%Y-%m-%d")
+        sales_date_to=datetime.datetime.strptime(request.GET.get('to'),"%Y-%m-%d")
 
         sales_date_to+=datetime.timedelta(days=1)
         order_items=OrderItem.objects.filter(created_at__range=[sales_date_from,sales_date_to])
@@ -465,6 +506,7 @@ def product_csv(request):
             ]
         )
     return response
+
 
 
 class generateProductPdf(View):
@@ -522,3 +564,190 @@ def product_excel(request):
 
     wb.save(response)
     return response
+
+
+
+def sales_csv(request):
+    response=HttpResponse(content_type='text/csv')
+    response[
+        "Content-Disposition"
+    ] = "attachement; filename=Sales_Report.csv"
+
+    products=Product.objects.all().order_by('-id')
+    writer=csv.writer(response)
+    writer.writerow(
+        [
+            "Product Name",
+            "Category Name",
+            "Subcategory Name",
+            "Price"
+            "Stock",
+            "Revenue",
+            "Sold Count"
+            "Profit",
+        ]
+    )
+    for p in products:
+        writer.writerow(
+            [
+                p.product_name,
+                p.category.cat_name,
+                p.subcategory.sub_name,
+                p.price,
+                p.stock,
+                p.get_revenue()[0]["revenue"],
+                p.get_count()[0]["quantity"],
+                p.get_profit()
+
+            ]
+        )
+    return response
+
+
+
+def sales_excel(request):
+    response=HttpResponse(content_type='application/ms-excel')
+    response[
+        "Content-Disposition"
+    ] = "attachement; filename=Sales_Report.xls"
+    wb=xlwt.Workbook(encoding='utf-8')
+    ws=wb.add_sheet('Product_Data')
+    row_num=0
+    font_style=xlwt.XFStyle()
+    font_style.font.bold=True
+
+    columns=[
+            "Order ID"
+            "Product Name",
+            "Price",
+            "Quantity",
+            "Status"
+    ]
+
+    for col_num in range(len(columns)):
+        ws.write(row_num,col_num,columns[col_num],font_style)
+
+    font_style=xlwt.XFStyle()
+    rows=OrderItem.objects.all().values_list('order','product','price','quantity','status')
+
+    for row in rows:
+        row_num+=1
+
+        for col_num in range(len(row)):
+            ws.write(row_num,col_num,str(row[col_num]),font_style)
+
+    wb.save(response)
+    return response
+
+
+
+class generateSalesPdf(View):
+    def get(self,request,*args,**kwargs):
+        try:
+            products=Product.objects.all()
+            
+        except:
+            return HttpResponse("505 not found")
+        data={
+            'products':products,
+            
+        }
+        pdf=render_to_pdf('adminapp/sales_pdf.html',data)
+        return HttpResponse(pdf,content_type='application/pdf')
+
+def category_offer(request):
+    cat_offer=CategoryOffer.objects.all()
+    return render(request,'adminapp/category_offer.html',{
+        'cat_offer':cat_offer
+    })
+
+def subcategory_offer(request):
+    sub_offer=SubcategoryOffer.objects.all()
+    return render(request,'adminapp/subcategory_offer.html',{
+        'sub_offer':sub_offer
+    })
+
+def product_offer(request):
+    product_offer=ProductOffer.objects.all()
+    return render(request,'adminapp/product_offer.html',{
+        'product_offer':product_offer
+    })
+
+
+def add_category_offer(request):
+    form=CategoryOfferForm()
+    if request.method=='POST':
+        form=CategoryOfferForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('category_offer')
+    context={
+        'form':form
+    }
+    return render(request,'adminapp/add_category_offer.html',context)
+
+def add_subcategory_offer(request):
+    form=SubcategoryOfferForm()
+    if request.method=='POST':
+        form=SubcategoryOfferForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('subcategory_offer')
+    context={
+        'form':form
+    }
+    return render(request,'adminapp/add_subcategory_offer.html',context)
+
+def add_product_offer(request):
+    form=ProductOfferForm()
+    if request.method=='POST':
+        form=ProductOfferForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('product_offer')
+    context={
+        'form':form
+    }
+    return render(request,'adminapp/add_product_offer.html',context)
+
+
+
+
+def edit_category_offer(request):
+    pass
+
+def edit_subcategory_offer(request):
+    pass
+def edit_product_offer(request):
+    pass
+
+def delete_category_offer(request):
+    pass
+
+def delete_subcategory_offer(request):
+    pass
+
+def delete_product_offer(request):
+    pass
+
+def coupons(request):
+    coupons=Coupon.objects.all()
+    return render(request,'adminapp/coupons.html',{
+        'coupons':coupons
+    })
+
+
+def add_coupons(request):
+    form=CouponOfferForm()
+    if request.method=='POST':
+        form=CouponOfferForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('coupons')
+    else:
+        print('error')
+    
+    return render(request,'adminapp/add_coupons.html',{
+        'form':form
+    })
+

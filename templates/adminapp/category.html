@@ -215,7 +215,7 @@
                             <td>{{ c.cat_name }}</td>
                             <td> 
                                 <a href="{% url 'editcategory' c.id %}"><button type="submit" class="btn btn-dark ">Edit</button> </a>
-                                <button onclick="deletepop()" type="button" class="btn btn-danger mx-2">Delete</button> </td>
+                                <a href="{% url 'deletecategory' c.id %}"><button onclick=delcategory() type="button" class="btn btn-danger mx-2">Delete</button> </td></a>
                           </tr>
                           <!-- <div id="myModal" class="modal fade">
                             <div class="modal-dialog modal-confirm">
@@ -262,5 +262,26 @@
     </div>
     <!-- page-body-wrapper ends -->
   </div>
-  
+  <script>
+    function delcategory() {
+      event.preventDefault();
+      var dlt = event.currentTarget.href
+      console.log(dlt)
+      Swal.fire({
+        title: 'Cancel this order?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#2DAD49',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Cancel Order',
+        cancelButtonText: 'Back',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          
+          window.location = dlt;
+        }
+      })
+    }
+  </script>
  {% endblock %}

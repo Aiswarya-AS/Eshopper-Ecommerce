@@ -187,8 +187,10 @@
                 <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                   <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
-                      <a class="nav-link active ps-0" id="home-tab"  href="{% url 'product_report' %}"   >Product Report</a>
-                      <a class="nav-link active ps-0" id="home-tab"  href="{% url 'sales_report' %}"   >Product Report</a>
+                      <a class="nav-link active ps-0" id="home-tab"  href="{% url 'product_report' %}">Product Report</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                      <a class="nav-link active ps-0" id="home-tab"  href="{% url 'sales_report' %}">Sales Report</a>
                     </li>
                     
                     
@@ -221,16 +223,7 @@
                             <h3 class="rate-percentage">{{total_revenue.total_price__sum}}</h3>
                             <!-- <p class="text-success d-flex"><i class="mdi mdi-menu-down"></i><span>+0.8%</span></p> -->
                           </div>
-                          <div class="d-none d-md-block">
-                            <p class="statistics-title">New Sessions</p>
-                            <h3 class="rate-percentage">68.8</h3>
-                            <!-- <p class="text-danger d-flex"><i class="mdi mdi-menu-down"></i><span>68.8</span></p> -->
-                          </div>
-                          <div class="d-none d-md-block">
-                            <p class="statistics-title">Avg. Time on Site</p>
-                            <h3 class="rate-percentage">2m:35s</h3>
-                            <!-- <p class="text-success d-flex"><i class="mdi mdi-menu-down"></i><span>+0.8%</span></p> -->
-                          </div>
+                          
                         </div>
                       </div>
                     </div> 

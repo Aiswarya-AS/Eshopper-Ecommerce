@@ -43,16 +43,15 @@
     </div>
     <!-- Page Header End -->
 
-    {% for message in messages %}
-    <div class=" container alert alert-success" role="alert">
-        <h5 class="text-center">{{ message }}- <a href="{% url 'user_wishlist' %}">Wishlist</a> </h5>
-      </div>
-      {% endfor %}
+    
     <!-- Shop Detail Start -->
+    {% if single_product.id %}
     <span class="float-right m-5">
         <a href="{% url 'add_to_wishlist' single_product.id %}"> <button style="border:none;width:2rem;height:2rem;"> <i class="fas fa-heart text-primary"></i></button></a>
-
     </span>
+    {% else %}
+        <p>added</p>
+    {% endif %}
     <div class="container-fluid py-5">
         <div class="row px-xl-5">
             <div class="col-lg-5 pb-5">

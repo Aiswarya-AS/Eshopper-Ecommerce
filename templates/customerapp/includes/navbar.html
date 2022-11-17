@@ -8,28 +8,26 @@
     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
         <div class="navbar-nav mr-auto py-0">
             <a href="{% url 'home' %}" class="nav-item nav-link active">Home</a>
-            <a href="{% url 'store' %}" class="nav-item nav-link">Shop</a>
+            <!-- <a href="{% url 'store' %}" class="nav-item nav-link">Shop</a> -->
+            {% for c in category %}
+            <a href="{{ c.get_url }}" class="nav-item nav-link">{{c.cat_name  }}</a>
+            {% endfor %}
             
-            <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">My Account</a>
-                <div class="dropdown-menu rounded-0 m-0">
-                    
-                    <a href="{% url 'my_profile'  %}" class="dropdown-item">Profile</a>
-                    <a href="{% url 'order_summary' %}" class="dropdown-item">My Orders</a>
-                    <a href="{% url 'view_address'  %}" class="dropdown-item">Address</a>
-                </div>
-            </div>
-            <a href="contact.html" class="nav-item nav-link">Contact</a>
+            <!-- <a href="contact.html" class="nav-item nav-link">Contact</a> -->
         </div>
 
 
         {% if user.is_authenticated %}
         <div class="navbar-nav ml-auto py-0">
             
-          
+            <div class="nav-item dropdown mt-2 mr-2">
+                <a href="{% url 'my_profile' %}" class="nav-link float-left" ><i class="fa-regular fa-user"></i></a>
+               
+            </div>
             <a href="{% url 'logout_user' %}" class="nav-item nav-link"> <div class="input-group-append">
                 <button class="btn btn-primary">Logout</button>
             </div> </a>
+
         </div>
         
         {% else %}

@@ -1,5 +1,5 @@
 from math import prod
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render,redirect
 from carts.models import CartItem
 from category.models import Product
@@ -98,9 +98,14 @@ def cart(request,total=0,quantity=0,cart_items=None):
 
             cart=Cart.objects.get(cart_id=_cart_id(request))
             cart_items=CartItem.objects.filter(cart=cart,is_active=True)
+        
 
         for cart_item in cart_items:
-            total+=(cart_item.product.price*cart_item.quantity)
+            if cart_item.product.offer_price():
+                offer_price=Product.offer_price(cart_item.product)
+                total+=(offer_price["new_price"]*cart_item.quantity)
+            else:
+                total+=(cart_item.product.price*cart_item.quantity)
             quantity+=cart_item.quantity
     except:
         pass
@@ -129,7 +134,10 @@ def remove_from_cart(request,product_id):
             cart_item.delete()
     except:
         pass
-    return redirect('cart')
+    # return redirect('cart')
+    return JsonResponse({
+        'quantity':'quantity',
+    })
 
 def delete_cart_item(request,product_id):
     
@@ -147,7 +155,12 @@ def checkout(request,total=0,quantity=0):
     address=Address.objects.filter(user=request.user)
     cart_items=CartItem.objects.filter(user=request.user,is_active=True)
     for cart_item in cart_items:
-        total+=(cart_item.product.price*cart_item.quantity)
+        if cart_item.product.offer_price():
+                offer_price=Product.offer_price(cart_item.product)
+                total+=(offer_price["new_price"]*cart_item.quantity)
+        else:
+            total+=(cart_item.product.price*cart_item.quantity)
+    
         quantity+=cart_item.quantity
     return render(request,'customerapp/checkout.html',{
         'cart_items':cart_items,

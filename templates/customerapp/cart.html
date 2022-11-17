@@ -66,23 +66,26 @@
                             <td class="align-middle"> <div class="float-left"> <img src="{{ cart_item.product.img1.url }}" alt="" style="width: 50px;">  {{ cart_item.product.product_name }} </div> </td>
                             <td class="align-middle">₹{{ cart_item.product.price }}</td>
                             <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <a href="{% url 'remove_from_cart' cart_item.product.id %}  "><button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button></a>
-                                    </div>
+                                <!-- <form action="",method="POST">
+                                {% csrf_token %} -->
+                                        <div class="input-group quantity mx-auto" style="width: 100px;">
+                                            <div class="input-group-btn">
+                                            <button onclick="minusBtn({{ cart_item.id }} , {{ cart_item.product.id }})" class="btn btn-sm btn-primary btn-minus" >
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                            </div>
 
 
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="{{ cart_item.quantity }}">
-                                    
-                                    <div class="input-group-btn">
+                                            <input type="text" id='quantity_value' class="form-control form-control-sm bg-secondary text-center" value="{{ cart_item.quantity }}">
+                                            
+                                            <div class="input-group-btn">
 
-                                       <a href="{% url 'add_to_cart' cart_item.product.id %}"><button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button></a> 
-                                    </div>
-                                </div>
+                                            <a href="{% url 'add_to_cart' cart_item.product.id %}"><button class="btn btn-sm btn-primary btn-plus">
+                                                    <i class="fa fa-plus"></i>
+                                                </button></a> 
+                                            </div>
+                                        </div>
+                            <!-- </form> -->
                             </td>
                             <td class="align-middle">₹{{ cart_item.sub_total }}</td>
                             <td class="align-middle"><a href="#myModal" class="trigger-btn" data-toggle="modal"> <button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></a></td>
@@ -134,10 +137,7 @@
                             <h6 class="font-weight-medium">Subtotal</h6>
                             <h6 class="font-weight-medium">₹{{ total }}</h6>
                         </div>
-                        <!-- <div class="d-flex justify-content-between">
-                            <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">$10</h6>
-                        </div> -->
+                        
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
@@ -154,5 +154,25 @@
 
 {% endif %}
     {% include 'customerapp/includes/footer.html' %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        function minusBtn(cart_id,product_id){
+            var cartId=cart_id;
+            var productId=product_id;
+            $.ajax({
+                type:"POST",
+                url:"remove_from_cart",
+                csrftokenmiddleware:"{{ csrf_token }}",
+                data:{
+                    "cart_id":cartId,
+                    "product_id":productId
+                },
+                success:function(r){
+                    console.log(r.quantity);
+                }
+            });
+        }
+    </script>
 
 {% endblock %}
