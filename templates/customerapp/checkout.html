@@ -25,19 +25,41 @@
  
      <!-- Customized Bootstrap Stylesheet -->
      <link href="{% static 'css/style.css' %}" rel="stylesheet">
+     <script src="{% static '/js/jquery-3.6.1.js' %}"></script>
+     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     
+
    
   </head>
   <body>
-    
+    <!-- <div class="row">
+      <div class="col-lg-4">
+        <form class="mb-5" id="coupon_form">
+            {% csrf_token %}
+            {% for i in messages %}
+            <p class="pl-3"style="color:red;">{{i}}</p>
+            {% endfor %}
+            <div class="input-group">
+                <input type="text" name="code" id="code" class="form-control p-4" placeholder="Coupon Code">
+                <div class="input-group-append">
+                    <a onclick="apply_coupon()" class="btn btn-primary">Apply Coupon</a>
+                </div>
+            </div>
+        </form>
+        </div>
+    </div> -->
     <div class="container">
         <div class="py-5 text-center">
           
           <h2>Checkout form</h2>
+          
         </div>
-      
+        
+        
         <form action="{% url 'place_order' %}" method="POST">
           {% csrf_token %}
         <div class="row ml-3">
+          
           <div class="col-md-4 order-md-2 mb-4">
             {% if  total  > 0 %}
             <h4 class="d-flex justify-content-between align-items-center mb-3">
@@ -59,8 +81,17 @@
               
               {% endfor %}
               <li class="list-group-item d-flex justify-content-between">
-                <span>Total (USD)</span>
-                <strong>${{ total }}</strong>
+                <span>Total</span>
+                <strong id="grand_total">{{ total|floatformat:2  }}</strong>
+              <!-- </li>
+                <li class="list-group-item d-flex justify-content-between">
+                <span> Discount Price</span>
+                <strong id="amount_pay">0</strong>
+              </li> -->
+              <li class="list-group-item d-flex justify-content-between">
+                <span>Total </span>
+                <strong id="total" name="total">{{ total|floatformat:2  }}</strong>
+                
               </li>
               
             </ul>
@@ -73,9 +104,9 @@
             {% else %}
               
                 <div class="mt-2 text-center">
-                  <button class="btn btn-primary btn-lg" style="width:21.2rem;background-color:#EEEEEE;border:none;" type="submit">Cash On Delivary  </button>
+                  <button class="btn btn-primary btn-lg" style="width:21.2rem;" type="submit">Cash On Delivary  </button>
               
-                  <button class="btn btn-primary btn-lg mt-2 mb-2 payWithRazorpay" style="width:21.2rem;background-color:#EEEEEE;border:none;" type="button">Pay With Razorpay  </button>
+                  <button class="btn btn-primary btn-lg mt-2 mb-2 payWithRazorpay" style="width:21.2rem;" type="button">Pay With Razorpay  </button>
                   <div id="paypal-button-container"></div>
                 </div>
               {% endif %}
@@ -95,6 +126,7 @@
             <a href="{% url 'add_address' %}" class="btn btn-primary mt-5" style="width:16rem;" type="submit">Add New Address  </a>
             </div>
           {% else %}
+          
           <h3 class="mt-5">Select Address</h3>
           
           <div class="col-md-8 order-md-1">
@@ -107,6 +139,7 @@
               </div>
             </div>
             {% endfor %}
+            
           </div>
           
           <!-- <a href="{% url 'add_address' %}"><h6>Add New Address</h6></a> -->
@@ -114,7 +147,25 @@
           <a href="{% url 'add_address' %}" class="btn btn-primary mt-5  float-right" style="margin-left:21.5rem;" type="submit">Add New Address  </a>
         </form>
         <div>
+          
         </div>
+        <div class="">
+          <div class="col-lg-12 mt-5">
+            <form class="mb-5" id="coupon_form">
+                
+                {% for i in messages %}
+                <p class="pl-3"style="color:red;">{{i}}</p>
+                {% endfor %}
+                <div class="input-group">
+                    <input type="text" name="code" id="code" class="form-control p-4" placeholder="Coupon Code">
+                    <div class="input-group-append">
+                        <a onclick= 'apply_coupon()'  class="btn btn-primary">Apply Coupon</a>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+  
         
       </div>
         <footer class="my-5 pt-5 text-muted text-center text-small">
@@ -127,22 +178,30 @@
         </footer>
       </div>
       
+      
       <!-- Razorpay -->
     
       <script src="{% static '/js/jquery-3.6.1.js' %}"></script>
       <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
       <script src="{% static '/js/checkout.js' %}"></script>
-
+      <!-- <script src="{% static '/js/coupon.js' %}"></script> -->
+      
+      
 
       {% block scripts %}
       <script src="https://www.paypal.com/sdk/js?client-id=AZ52qvfMslohQsWKKcQkBKSwDljMb_4WxlEyrS-Msb5-ngFD0p0vGN48U-HgFi0tkCSVFhAivRhtMKm0&currency=USD&components=buttons,marks&disable-funding=credit,card"></script>
-
+      
       <script>
+
+
+        
+      
+  
         paypal.Buttons({
           style: {
             
-            color:   'silver',
+            color:   'black',
             
           },
           // Sets up the transaction when a payment button is clicked
@@ -164,7 +223,7 @@
             return actions.order.create({
               purchase_units: [{
                 amount: {
-                  value: '0.01' // Can also reference a variable or function
+                  value: {{ total }} // Can also reference a variable or function
                 }
               }]
             });
@@ -204,7 +263,38 @@
             });
           }
         }).render('#paypal-button-container');
-      </script>
+
+                      
+              function apply_coupon(){
+                flag=0
+                var code=document.getElementById('code').value
+                console.log(code)
+                            
+                $.ajax({
+                  type:"GET",
+                  url:"/cart/apply_coupon/",
+                  data:{
+                      'code':code
+                  },
+                  success : function(r){
+                  
+                      $('#total').text("₹"+r.total)
+                      
+                  },
+                  error:function(r){
+                      alert('Error Occured')
+                  }
+              });
+              } 
+              
+        </script>
+
+
+
+
+
+      
+        
       {% endblock %}
       
     <!-- Optional JavaScript; choose one of the two! -->

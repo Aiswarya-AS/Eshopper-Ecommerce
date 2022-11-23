@@ -198,11 +198,12 @@
                     <table class="table table-striped">
                       <thead>
                         <tr>
-                            <th>Coupon</th>
+                            <th>Coupon Name</th>
+                            <th>Code</th>
                             <th>Discount</th>
                             <th>Valid From</th>
                             <th>Valid To</th>
-                            <th>Minimum Amount</th>
+                            <th>Coupon Limit</th>
                             
                             <th class="text-center">Status</th>
 
@@ -215,11 +216,12 @@
                             <tr>
                             
                             
+                            <td>{{ c.coupon_name }}</td>
                             <td>{{ c.code }}</td>
                             <td>{{ c.discount }}</td>
                             <td>{{ c.valid_from }}</td>
                             <td>{{ c.valid_to }}</td>
-                            <td>{{ c.min_amount }}</td>
+                            <td>{{ c.coupon_limit }}</td>
                             <td> 
                                 <a href="{% url 'editcategory' c.id %}"><button type="submit" class="btn btn-dark ">Edit</button> </a>
                                 <a href="{% url 'deletecategory' c.id %}"><button onclick=delcategory() type="button" class="btn btn-danger mx-2">Delete</button> </td></a>

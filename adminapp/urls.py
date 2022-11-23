@@ -73,5 +73,11 @@ urlpatterns = [
     path('delete_product_offer',views.delete_product_offer,name='delete_product_offer'),
 
     path('coupons/',views.coupons,name='coupons'),
-    path('add_coupons/',views.add_coupons,name='add_coupons')
+    path('add_coupons/',views.add_coupons,name='add_coupons'),
+
+
+    path('salesReport/',views.salesReport,name='salesReport'),
+    path('by_date/',views.by_date,name='by_date'),
+    path('generatesalesReportPdf',views.generatesalesReportPdf.as_view(),name='generatesalesReportPdf'),
+
 ]

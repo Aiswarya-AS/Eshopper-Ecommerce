@@ -9,6 +9,7 @@ from carts.models import CartItem
 from category.models import Product
 from orders.models import Order, OrderItem
 from django.contrib import messages
+from offers.models import Coupon,ReviewCoupon
 # Create your views here.
 
 @login_required(login_url='login-page')
@@ -42,17 +43,24 @@ def place_order(request):
         print(neworder.address)
         neworder.payment_mode=request.POST.get('payment_mode')
         neworder.payment_id=request.POST.get('payment_id')
+
         
         cart_items=CartItem.objects.filter(user=request.user)
         cart_total_price=0
         for cart_item in cart_items:
-            cart_total_price+=(cart_item.product.price*cart_item.quantity)
-        
+            if cart_item.product.offer_price():
+                offer_price=Product.offer_price(cart_item.product)
+                cart_total_price+=(offer_price["new_price"]*cart_item.quantity)
+            else:
+                cart_total_price+=(cart_item.product.price*cart_item.quantity)
 
+            if cart_item.coupon_discount:
+                cart_total_price=cart_item.coupon_discount
+            else:
+                pass
+        
         neworder.total_price=cart_total_price
         neworder.save()
-
-
         neworderitems=CartItem.objects.filter(user=request.user)
         for item in neworderitems:
             OrderItem.objects.create(
@@ -70,7 +78,8 @@ def place_order(request):
             orderproduct.stock-=item.quantity
             orderproduct.save()
 
-
+        
+        
         CartItem.objects.filter(user=request.user).delete()
         messages.success(request,'Your order has been placed Succesfully')
         
@@ -81,14 +90,12 @@ def place_order(request):
 
     
     return redirect('order_summary')
-    
+
+
 @login_required(login_url='login-page')
 def order_cancel(request,id):
-    print('>>>>>>>>>>>>>>>>>>>>>>>')
     order_item=OrderItem.objects.get(id=id)
     product=Product.objects.get(id=order_item.product_id)
-    # orders=Order.objects.get(user=request.user,id=order_item.product_id)
-    # print(orders,'?????????????????')
     product.stock+=order_item.quantity
     product.save()
     order_item.status="Order Cancelled"
@@ -175,3 +182,6 @@ def render_to_pdf(template_src,context_dict={}):
     if not pdf.err:
         return HttpResponse(result.getvalue(),content_type='application/pdf')
     return None
+
+
+

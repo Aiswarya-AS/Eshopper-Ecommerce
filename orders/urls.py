@@ -9,6 +9,8 @@ urlpatterns = [
     path('order_status_change/',views.order_status_change,name='order_status_change'),
     path('return_order/<int:id>/',views.return_order,name='return_order'),
     path('accept_return/<int:id>/',views.accept_return,name='accept_return'),
-    path('genericinvoice/<int:id>/',views.generateInvoice.as_view(), name = 'generateinvoice')
+    path('genericinvoice/<int:id>/',views.generateInvoice.as_view(), name = 'generateinvoice'),
+
+    
 
 ]

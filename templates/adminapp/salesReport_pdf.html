@@ -149,38 +149,33 @@
 <body>
     <h1>Sales Report</h1>
     <table>
-        <tr>
-            <th>Product Name</th>
+        <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Order Date</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th>Order Status</th>
+              <!-- <th>Is Available</th> -->
             
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Revenue</th>
-            <th>Sales Count</th>
-            <th>Profit</th>
-        </tr>
-        {% for p in products %}
-        <tr>
-            <td>{{ p.product_name }}</td>
+              
+            </tr>
+          </thead>
+          
+          <tbody>
             
-            <td>{{ p.price }}</td>
-            <td>{{ p.stock }}</td>
-            <td>{% if  p.get_revenue %}
-                {{p.get_revenue.0.revenue}}
-                {% else %}
-                No orders
-                {% endif %}</td>
-            <td>{% if p.get_revenue %}
-                {{p.get_count.0.quantity}}
-                {% else %}
-                No orders
-                {% endif %}</td>
-            <td>{% if  p.get_revenue %}
-                {{p.get_profit}}
-                {% else %}
-                Null
-                {% endif %}</td>
-        </tr>
-        {% endfor %}
+            {% for o in order %}
+            <tr>
+                <td>{{ o.id }}</td>
+                <td>{{ o.ordered_date }}</td>
+                <td>{{ o.user }}</td>
+                <td>{{ o.price }}</td>
+                <td>{{ o.method }}</td>
+                <td>{{ o.status }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
     </table>
 </body>
 </html>

@@ -1,6 +1,7 @@
 from django.forms import ModelForm
-
-from .models import CategoryOffer,SubcategoryOffer,ProductOffer,Coupon
+from django import forms
+from .models import Coupon
+from .models import CategoryOffer,SubcategoryOffer,ProductOffer
 
 
 class CategoryOfferForm(ModelForm):
@@ -48,25 +49,30 @@ class ProductOfferForm(ModelForm):
         )
 
 
-class CouponOfferForm(ModelForm):
+
+
+
+class DateInput(forms.DateInput):
+    input_type = "date"
+
+
+class CouponForm(forms.ModelForm):
     class Meta:
-        model=Coupon
-        fields=['code','discount','min_amount','valid_from','valid_to']
-    
-    def __init__(self,*args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["code"].widget.attrs.update(
-            {"class":"form-control","placeholder":"Create Coupon Code"}
-        )
-        self.fields["discount"].widget.attrs.update(
-            {"class":"form-control","placeholder":"Enter the discount amount"}
-        )
-        self.fields["min_amount"].widget.attrs.update(
-            {"class":"form-control","placeholder":"Enter the Minimum amount"}
-        )
-        self.fields["valid_from"].widget.attrs.update(
-            {"class":"form-control","placeholder":"Valid from"}
-        )
-        self.fields["valid_to"].widget.attrs.update(
-            {"class":"form-control","placeholder":"Valid to"}
-        )
+        model = Coupon
+        fields = [
+            "coupon_name",
+            "code",
+            "coupon_limit",
+            "discount",
+            "valid_from",
+            "valid_to",
+        ]
+        widgets = {
+            "valid_from": DateInput(),
+            "valid_to": DateInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(CouponForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs["class"] = "form-control"

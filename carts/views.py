@@ -1,3 +1,4 @@
+from datetime import date
 from math import prod
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render,redirect
@@ -8,6 +9,10 @@ from django.contrib.auth.decorators import login_required
 from userprofile.models import Address
 from category.models import Category,Subcategory,Variations
 from django.http import HttpResponseRedirect
+from django.views.decorators.cache import never_cache
+from django.contrib import messages
+from offers.models import Coupon,ReviewCoupon
+
 # Create your views here.
 
 def _cart_id(request):
@@ -24,9 +29,11 @@ def add_cart(request,product_id):
     if request.method=="POST":
         c=request.POST.get('color')
         s=request.POST.get('size')
+        
 
         try:
             variation=Variations.objects.get(product=product,color=c,size=s)
+            print(variation,"................................")
             product_variation.append(variation)
         except:
             pass
@@ -98,15 +105,17 @@ def cart(request,total=0,quantity=0,cart_items=None):
 
             cart=Cart.objects.get(cart_id=_cart_id(request))
             cart_items=CartItem.objects.filter(cart=cart,is_active=True)
-        
-
+        total_price=0
+        saved=0
         for cart_item in cart_items:
+            total_price=(cart_item.product.price*cart_item.quantity)
             if cart_item.product.offer_price():
                 offer_price=Product.offer_price(cart_item.product)
                 total+=(offer_price["new_price"]*cart_item.quantity)
             else:
                 total+=(cart_item.product.price*cart_item.quantity)
             quantity+=cart_item.quantity
+            saved=total_price-total
     except:
         pass
     return render(request,'customerapp/cart.html',{
@@ -115,7 +124,12 @@ def cart(request,total=0,quantity=0,cart_items=None):
         'cart_items':cart_items,
         'category':category,
         'subcategory':subcategory,
+        'total_price':total_price,
+        'saved':saved
     })
+
+
+
 
 def remove_from_cart(request,product_id):
     product=get_object_or_404(Product,id=product_id)
@@ -162,9 +176,115 @@ def checkout(request,total=0,quantity=0):
             total+=(cart_item.product.price*cart_item.quantity)
     
         quantity+=cart_item.quantity
+
     return render(request,'customerapp/checkout.html',{
         'cart_items':cart_items,
         'total':total,
         'quantity':quantity,
         'address':address
     })
+
+
+def decrease_quantity(request):
+    product_id=request.GET.get('id')
+    product=get_object_or_404(Product,id=product_id)
+
+
+    if request.user.is_authenticated:
+            cart_item=CartItem.objects.get(product=product,user=request.user)
+    else:
+        cart=Cart.objects.get(cart_id=_cart_id(request))
+        cart_item=CartItem.objects.get(product=product,cart=cart)
+
+    if cart_item.quantity:
+        qty=cart_item.quantity - 1
+        cart_item.quantity-=1
+        if cart_item.quantity==0:
+            cart_item.quantity=1
+        else:
+            pass
+        cart_item.save()
+        total_price=(cart_item.product.price*cart_item.quantity)
+        total=0
+        if cart_item.product.offer_price():
+            offer_price=Product.offer_price(cart_item.product)
+            total+=(offer_price["new_price"]*cart_item.quantity)
+            total=round(total,2)
+        else:
+            total+=(cart_item.product.price*cart_item.quantity)
+        cart_item.save()
+        sub_total=cart_item.sub_total()
+        saved=total_price-total
+        
+    return JsonResponse({
+        'quantity':qty,
+        'total':total,
+        'sub_total':sub_total,
+        'total_price':total_price,
+        'saved':saved,
+
+    })
+
+
+def increase_quantity(request):
+    product_id=request.GET.get('id')
+    product=get_object_or_404(Product,id=product_id)
+
+
+    if request.user.is_authenticated:
+            cart_item=CartItem.objects.get(product=product,user=request.user)
+    else:
+        cart=Cart.objects.get(cart_id=_cart_id(request))
+        cart_item=CartItem.objects.get(product=product,cart=cart)
+
+    if cart_item.quantity:
+        qty = cart_item.quantity + 1
+        cart_item.quantity += 1
+        cart_item.save()
+        total_price=(cart_item.product.price*cart_item.quantity)
+        total=0
+        if cart_item.product.offer_price():
+            offer_price=Product.offer_price(cart_item.product)
+            total+=(offer_price["new_price"]*cart_item.quantity)
+            total=round(total,2)
+        else:
+            total+=(cart_item.product.price*cart_item.quantity)
+        cart_item.save()
+        sub_total=cart_item.sub_total()
+        you_saved=total_price-total
+        saved=round(you_saved,2)
+    return JsonResponse({
+        'quantity':qty,
+        'total':total,
+        'sub_total':sub_total,
+        'total_price':total_price,
+        'saved':saved,
+
+    })
+
+
+
+def apply_coupon(request):
+    
+    cart_item=CartItem.objects.get(user=request.user)
+    total=0
+    if cart_item.product.offer_price():
+            offer_price=Product.offer_price(cart_item.product)
+            total+=(offer_price["new_price"]*cart_item.quantity)
+            total=round(total,2)
+    else:
+        total+=(cart_item.product.price*cart_item.quantity)
+    print(total)
+    if request.method=='GET':
+        code=request.GET.get('code')
+        coupon=Coupon.objects.get(code=code)
+        total=total-coupon.discount
+        cart_item.coupon_discount=total
+        cart_item.save()
+    # return redirect('checkout')
+    return JsonResponse({
+        'total':total,
+    })
+
+
+

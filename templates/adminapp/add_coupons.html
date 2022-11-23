@@ -194,9 +194,17 @@
                   <form class="forms-sample" method="POST" action="">
                     {% csrf_token %}
                     <div class="form-group row">
-                      <div class="col-sm-9">
+                      <div class="col-sm-9 mt-4">
+                        {{ form.coupon_name.label }}
+                        {{ form.coupon_name }}
+                      </div>
+                      <div class="col-sm-9 mt-4">
                         {{ form.code.label }}
                         {{ form.code }}
+                      </div>
+                      <div class="col-sm-9 mt-4">
+                        {{ form.coupon_limit.label }}
+                        {{ form.coupon_limit }}
                       </div>
 
                       <div class="col-sm-9 mt-4">

@@ -185,12 +185,20 @@
         {% endfor %}
         <div class="content-wrapper">
             <div class="m-2">
+              {% if products %}
                 <div class="btn-wrapper">
                     <a href="{% url 'generateSalesPdf' %}" class="btn btn-otline-dark"><i class="icon-printer"></i> Download as PDF</a>
                     <a href="{% url 'sales_csv' %}" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export as CSV</a>
                     <a href="{% url 'sales_excel' %}" class="btn mx-3 btn-success text-white me-0"><i class="icon-download"></i> Export as Excel</a>
                 </div>
-                <form action="{% url 'product_report' %}" method="GET">
+                {% else %}
+                <!-- <div class="btn-wrapper">
+                  <a href="{% url 'generateSalesPdf' %}" disabled class="btn btn-otline-dark"><i class="icon-printer"></i> Download as PDF</a>
+                  <a href="{% url 'sales_csv' %}" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export as CSV</a>
+                  <a href="{% url 'sales_excel' %}" class="btn mx-3 btn-success text-white me-0"><i class="icon-download"></i> Export as Excel</a>
+              </div> -->
+                {% endif %}
+                <form action="{% url 'sales_report' %}" method="GET">
                     <div class="row mt-5">
                         <div class="col-md-3">
                             <label>From</label>
@@ -218,17 +226,11 @@
 
                   </p>
                   <div class="table-responsive">
+                    {% if products %}
                     <table class="table table-striped">
                       <thead>
                         <tr>
                           <th>Product</th>
-                          
-                          <th>Category</th>
-                          <th>SubCategory</th>
-                          
-                          <th>Price</th>
-                          
-                          <th>Stock</th>
                           <th>Revenue</th>
                           <th>Profit</th>
                           <th>Sales Count</th>
@@ -237,14 +239,13 @@
                           
                         </tr>
                       </thead>
+                      
                       <tbody>
+                        
                         {% for p in products %}
                         <tr>
                             <td>{{ p.product_name }}</td>
-                            <td>{{ p.category.cat_name }}</td>
-                            <td>{{ p.subcategory.sub_name }}</td>
-                            <td>{{ p.price }}</td>
-                            <td>{{ p.stock }}</td>
+                            
                             <td>
                               {% if  p.get_revenue %}
                               {{p.get_revenue.0.revenue}}
@@ -269,10 +270,15 @@
                             </td>
                             <td>{{ stock }}</td>
                           </tr>
-                        {% endfor %}
-                          
+                        {% endfor %}  
                       </tbody>
+                      
                     </table>
+                    {% else %}
+                        <div>
+                          <h4 class="text-center mt-2" style="color: grey;">No data Found</h4>
+                        </div>
+                        {% endif %}
                   </div>
                 </div>
               </div>

@@ -21,7 +21,7 @@ from django.views.generic import View
 from django.template.loader import get_template
 import xlwt
 
-from offers.forms import CategoryOfferForm,SubcategoryOfferForm,ProductOfferForm,CouponOfferForm
+from offers.forms import CategoryOfferForm,SubcategoryOfferForm,ProductOfferForm,CouponForm
 from offers.models import CategoryOffer,SubcategoryOffer,ProductOffer,Coupon
 # Create your views here.
 
@@ -32,6 +32,7 @@ def admin_home(request):
         total_products=Product.objects.filter(is_available=True).count()
         total_orders=OrderItem.objects.filter(status='Delivered').count()
         total_revenue=Order.objects.aggregate(Sum('total_price'))
+        
 
         current_year=timezone.now().year
         order_detail=OrderItem.objects.filter(created_at__lt=datetime.date(current_year,12,31),status="Delivered")
@@ -59,7 +60,18 @@ def admin_home(request):
                 ).count()
             )
         
-        
+        placed_count=OrderItem.objects.filter(status="Order Placed").count()
+        shipped_count=OrderItem.objects.filter(status="Shipped").count()
+        delivered_count=OrderItem.objects.filter(status="Delivered").count()
+        return_count=OrderItem.objects.filter(status="Refund Initiated").count()
+        cancelled_count=OrderItem.objects.filter(status="Cancelled").count()
+
+
+        print(placed_count,"placed Count")
+        print(shipped_count,"shipped Count")
+        print(delivered_count,"delivered Count")
+        print(return_count,"return Count")
+        print(cancelled_count,"cancelled Count")
 
         
         return render(request,'adminapp/dashboard.html',{
@@ -74,7 +86,14 @@ def admin_home(request):
             'returns':returns,
             'dates':dates,
             'most_moving_product':most_moving_product,
-            'most_moving_product_count':most_moving_product_count
+            'most_moving_product_count':most_moving_product_count,
+            'status_count':[
+                placed_count,
+                shipped_count,
+                delivered_count,
+                return_count,
+                cancelled_count,
+            ]
 
         })
 
@@ -360,7 +379,7 @@ def orders(request):
     return render(request,'adminapp/orders.html',context)
 
 def order_items(request):
-    order_items=OrderItem.objects.all()[::-1]
+    order_items=OrderItem.objects.order_by("-id").all()
     context={
         
         'order_items':order_items
@@ -443,12 +462,13 @@ def product_report(request):
     products=Product.objects.all()
     
 
-    if request.GET.get('product_from'):
+    if request.GET.get('from'):
         product_date_from=datetime.datetime.strptime(request.GET.get('from'),"%Y-%m-%d")
         product_date_to=datetime.datetime.strptime(request.GET.get('to'),"%Y-%m-%d")
 
         product_date_to+=datetime.timedelta(days=1)
         products=Product.objects.filter(added_date__range=[product_date_from,product_date_to])
+        print(products,'..............')
     
     
     
@@ -464,14 +484,13 @@ def sales_report(request):
     
     order_items=OrderItem.objects.all().order_by('-created_at')
 
-    if request.GET.get('sales_from'):
+    if request.GET.get('from'):
         sales_date_from=datetime.datetime.strptime(request.GET.get('from'),"%Y-%m-%d")
         sales_date_to=datetime.datetime.strptime(request.GET.get('to'),"%Y-%m-%d")
 
         sales_date_to+=datetime.timedelta(days=1)
         order_items=OrderItem.objects.filter(created_at__range=[sales_date_from,sales_date_to])
-        
-        
+        products=Product.objects.filter(added_date__range=[sales_date_from,sales_date_to])
     return render(request,'adminapp/sales_report.html',{
         'products':products,
         'order_items':order_items
@@ -578,10 +597,6 @@ def sales_csv(request):
     writer.writerow(
         [
             "Product Name",
-            "Category Name",
-            "Subcategory Name",
-            "Price"
-            "Stock",
             "Revenue",
             "Sold Count"
             "Profit",
@@ -591,9 +606,6 @@ def sales_csv(request):
         writer.writerow(
             [
                 p.product_name,
-                p.category.cat_name,
-                p.subcategory.sub_name,
-                p.price,
                 p.stock,
                 p.get_revenue()[0]["revenue"],
                 p.get_count()[0]["quantity"],
@@ -738,9 +750,9 @@ def coupons(request):
 
 
 def add_coupons(request):
-    form=CouponOfferForm()
+    form=CouponForm()
     if request.method=='POST':
-        form=CouponOfferForm(request.POST)
+        form=CouponForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('coupons')
@@ -750,4 +762,94 @@ def add_coupons(request):
     return render(request,'adminapp/add_coupons.html',{
         'form':form
     })
+
+
+
+
+def salesReport(request):
+    orders=Order.objects.all()
+    new_order_list=[]
+
+    for i in orders:
+        order_items=OrderItem.objects.filter(order_id=i.id)
+        for j in order_items:
+            item={
+                'id':i.id,
+                'ordered_date':i.created_at,
+                'user':i.user,
+                'price':j.price,
+                'method':i.payment_mode,
+                'status':j.status,
+
+
+            }
+            new_order_list.append(item)
+        
+    return render(request,'adminapp/salesReport.html',{
+        'order':new_order_list,
+    })
+
+def by_date(request):
+    if request.GET.get('from'):
+        sales_date_from=datetime.datetime.strptime(request.GET.get('from'),"%Y-%m-%d")
+        sales_date_to=datetime.datetime.strptime(request.GET.get('to'),"%Y-%m-%d")
+
+        sales_date_to+=datetime.timedelta(days=1)
+        orders=Order.objects.filter(created_at__range=[sales_date_from,sales_date_to])
+
+    new_order_list=[]
+
+    for i in orders:
+        order_items=OrderItem.objects.filter(order_id=i.id)
+        for j in order_items:
+            item={
+                'id':i.id,
+                'ordered_date':i.created_at,
+                'user':i.user,
+                'price':j.price,
+                'method':i.payment_mode,
+                'status':j.status,
+
+
+            }
+            new_order_list.append(item)
+        
+    return render(request,'adminapp/salesReport.html',{
+        'order':new_order_list,
+    })
+
+class generatesalesReportPdf(View):
+    def get(self,request,*args,**kwargs):
+        try:
+            orders=Order.objects.all()
+            new_order_list=[]
+
+            for i in orders:
+                order_items=OrderItem.objects.filter(order_id=i.id)
+                for j in order_items:
+                    item={
+                        'id':i.id,
+                        'ordered_date':i.created_at,
+                        'user':i.user,
+                        'price':j.price,
+                        'method':i.payment_mode,
+                        'status':j.status,
+
+
+                    }
+                    new_order_list.append(item)
+                    
+        except:
+            return HttpResponse("505 not found")
+        data={
+            'order':new_order_list
+        }
+        pdf=render_to_pdf('adminapp/salesReport_pdf.html',data)
+        return HttpResponse(pdf,content_type='application/pdf')
+
+
+#coupon django ?
+
+
+
 

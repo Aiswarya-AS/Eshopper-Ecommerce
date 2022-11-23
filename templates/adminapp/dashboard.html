@@ -192,6 +192,9 @@
                     <li class="nav-item mx-3">
                       <a class="nav-link active ps-0" id="home-tab"  href="{% url 'sales_report' %}">Sales Report</a>
                     </li>
+                    <li class="nav-item mx-3">
+                      <a class="nav-link active ps-0" id="home-tab"  href="{% url 'salesReport' %}">Sales Report</a>
+                    </li>
                     
                     
                     
@@ -220,7 +223,7 @@
                           </div>
                           <div class="d-none d-md-block">
                             <p class="statistics-title">Total Revenue</p>
-                            <h3 class="rate-percentage">{{total_revenue.total_price__sum}}</h3>
+                            <h3 class="rate-percentage">{{total_revenue.total_price__sum|floatformat:2}}</h3>
                             <!-- <p class="text-success d-flex"><i class="mdi mdi-menu-down"></i><span>+0.8%</span></p> -->
                           </div>
                           
@@ -274,14 +277,14 @@
                               <div class="card-body">
                                 <div class="d-sm-flex justify-content-between align-items-start">
                                   <div>
-                                    <h4 class="card-title card-title-dash">Market Overview</h4>
+                                    <h4 class="card-title card-title-dash">Most Moving Product</h4>
                                   </div>
                                   <div>
                                 
                                   </div>
                                 </div>
                                 <div class="d-sm-flex align-items-center mt-1 justify-content-between">
-                                  <div class="d-sm-flex align-items-center mt-4 justify-content-between"><h2 class="me-2 fw-bold">$36,2531.00</h2><h4 class="me-2">USD</h4><h4 class="text-success">(+1.37%)</h4></div>
+                                  <div class="d-sm-flex align-items-center mt-4 justify-content-between"><h2 class="me-2 fw-bold"></h2><h4 class="me-2"></h4><h4 class="text-success"></h4></div>
                                   <div class="me-3"><div id="marketing-overview-legend"></div></div>
                                 </div>
                                 <div class="chartjs-bar-wrapper mt-3">
@@ -304,9 +307,9 @@
                                 <div class="row">
                                   <div class="col-lg-12">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                      <h4 class="card-title card-title-dash">Monthly  Sales</h4>
+                                      <h4 class="card-title card-title-dash">Status Count</h4>
                                     </div>
-                                    <canvas class="my-auto" id="total-sales" width="200"height="200"></canvas>
+                                    <canvas class="my-auto" id="status_count" width="200"height="200"></canvas>
                                     <div id="doughnut-chart-legend" class="mt-5 text-center"></div>
                                   </div>
                                 </div>
@@ -316,7 +319,7 @@
                         </div>
                         <div class="row flex-grow">
                           <div class="col-12 grid-margin stretch-card">
-                            <div class="card card-rounded">
+                            {% comment %} <div class="card card-rounded">
                               <div class="card-body">
                                 <div class="row">
                                   <div class="col-lg-12">
@@ -340,7 +343,7 @@
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            </div> {% endcomment %}
                           </div>
                         </div>
                     
@@ -367,7 +370,9 @@
     <!-- page-body-wrapper ends -->
   </div>
   <!-- container-scroller -->
+
 <script>
+
   new Chart(document.getElementById("total-sales"), {
     type: 'doughnut',
     data: {
@@ -387,6 +392,10 @@
       }
     }
 });
+
+
+
+
 new Chart(document.getElementById("sales-data"), {
   type: 'line',
   data: {
@@ -412,7 +421,7 @@ new Chart(document.getElementById("sales-data"), {
   options: {
     title: {
       display: true,
-      text: 'World population per region (in millions)'
+      {% comment %} text: 'World population per region (in millions)' {% endcomment %}
     }
   }
 });
@@ -424,7 +433,7 @@ new Chart(document.getElementById("most-moving-product"), {
     labels: [{% for m in most_moving_product %} "{{m.product_name|slice:":10"}}",{% endfor %}],
     datasets: [
       {
-        label: "Population (millions)",
+        {% comment %} label: "Population (millions)", {% endcomment %}
         backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
         data: {{most_moving_product_count}}
       }
@@ -434,11 +443,27 @@ new Chart(document.getElementById("most-moving-product"), {
     legend: { display: false },
     title: {
       display: true,
-      text: 'Predicted world population (millions) in 2050'
+      {% comment %} text: 'Predicted world population (millions) in 2050' {% endcomment %}
     }
   }
 });
-
+new Chart(document.getElementById("status_count"), {
+  type: 'pie',
+  data: {
+    labels: ["Placed","Shipped","Delivered","Returned","Cancelled"],
+    datasets: [{
+      {% comment %} label: "Population (millions)", {% endcomment %}
+      backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+      data: {{ status_count }}
+    }]
+  },
+  options: {
+    title: {
+      display: true,
+      {% comment %} text: 'Predicted world population (millions) in 2050' {% endcomment %}
+    }
+  }
+});
 </script>
   
 

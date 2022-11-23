@@ -59,7 +59,7 @@ def home(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('login-pass')
+    return redirect('home')
 
 def store(request,category_slug=None,subcategory_slug=None):
     category=Category.objects.all()
