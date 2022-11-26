@@ -189,15 +189,11 @@
               {% if order %}
                 <div class="btn-wrapper">
                     <a href="{% url 'generatesalesReportPdf' %}" class="btn btn-otline-dark"><i class="icon-printer"></i> Download as PDF</a>
-                    <!-- <a href="{% url 'sales_csv' %}" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export as CSV</a> -->
+                    <!-- <a href="" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export as CSV</a> -->
                     <button id="downlaodsalesReportexcel" class="btn mx-3 btn-success text-white me-0"><i class="icon-download"></i> Export as Excel</button>
                 </div>
                 {% else %}
-                <!-- <div class="btn-wrapper">
-                  <a href="{% url 'generateSalesPdf' %}" disabled class="btn btn-otline-dark"><i class="icon-printer"></i> Download as PDF</a>
-                  <a href="{% url 'sales_csv' %}" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export as CSV</a>
-                  <a href="{% url 'sales_excel' %}" class="btn mx-3 btn-success text-white me-0"><i class="icon-download"></i> Export as Excel</a>
-              </div> -->
+                
                 {% endif %}
                 <form action="{% url 'by_date' %}" method="GET">
                     <div class="row mt-5">
@@ -216,6 +212,52 @@
 
                     </div>
                 </form>
+                <!-- By month -->
+                <form action="{% url 'by_month' %}" method="POST">
+                  {% csrf_token %}
+                  <div class="row mt-3">
+                    <div class="col-md-4 mt-1">
+                      <select name="month" class="form-control" id="">
+                        <option value="01">Januvary</option>
+                        <option value="02">Februvary</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4 ">
+                      <button class="btn btn-primary" type="submit">Submit</button>
+                  </div>
+
+                  </div>
+                </form>
+
+
+                                <!-- By Year -->
+                                <form action="{% url 'by_year' %}" method="POST" >
+                                  {% csrf_token %}
+                                  <div class="row mt-3">
+                                    <div class="col-md-4 mt-1">
+                                      <select name="year" class="form-control" id="">
+                                        <option value="2020">2020</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2022">2022</option>
+                                        
+                                      </select>
+                                    </div>
+                                    <div class="col-md-4 ">
+                                      <button class="btn btn-primary" type="submit">Submit</button>
+                                  </div>
+                
+                                  </div>
+                                </form>
           <div class="row mt-4">
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">

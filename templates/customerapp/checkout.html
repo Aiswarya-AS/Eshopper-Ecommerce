@@ -27,6 +27,7 @@
      <link href="{% static 'css/style.css' %}" rel="stylesheet">
      <script src="{% static '/js/jquery-3.6.1.js' %}"></script>
      <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <script src="https://cdn.jsdelivr.net/gh/cosmogicofficial/quantumalert@latest/minfile/quantumalert.js" charset="utf-8"></script>
      
 
    
@@ -82,15 +83,15 @@
               {% endfor %}
               <li class="list-group-item d-flex justify-content-between">
                 <span>Total</span>
-                <strong id="grand_total">{{ total|floatformat:2  }}</strong>
-              <!-- </li>
+                <strong id="grand_total">{{ total|floatformat:"2"  }}</strong>
+              </li>
                 <li class="list-group-item d-flex justify-content-between">
                 <span> Discount Price</span>
-                <strong id="amount_pay">0</strong>
-              </li> -->
+                <strong id="discount_price" style="color: green;">0</strong>
+              </li>
               <li class="list-group-item d-flex justify-content-between">
                 <span>Total </span>
-                <strong id="total" name="total">{{ total|floatformat:2  }}</strong>
+                <strong id="total" name="total">{{ total|floatformat:"2"  }}</strong>
                 
               </li>
               
@@ -139,6 +140,22 @@
               </div>
             </div>
             {% endfor %}
+            <div class="">
+              <div class="col-lg-7 mt-5">
+                <form class="mb-5" id="coupon_form">
+                    
+                    {% for i in messages %}
+                    <p class="pl-3"style="color:red;">{{i}}</p>
+                    {% endfor %}
+                    <div class="input-group">
+                        <input type="text" name="code" id="code" class="form-control p-4" placeholder="Coupon Code">
+                        <div class="input-group-append">
+                            <a onclick= 'apply_coupon()'  class="btn btn-primary " style="padding-top: .7rem;">Apply Coupon</a>
+                        </div>
+                    </div>
+                </form>
+                </div>
+            </div>
             
           </div>
           
@@ -149,7 +166,7 @@
         <div>
           
         </div>
-        <div class="">
+        <!-- <div class="">
           <div class="col-lg-12 mt-5">
             <form class="mb-5" id="coupon_form">
                 
@@ -165,7 +182,7 @@
             </form>
             </div>
         </div>
-  
+   -->
         
       </div>
         <footer class="my-5 pt-5 text-muted text-center text-small">
@@ -264,27 +281,42 @@
           }
         }).render('#paypal-button-container');
 
-                      
+              let flag=0
               function apply_coupon(){
-                flag=0
+                
+                console.log(flag)
                 var code=document.getElementById('code').value
                 console.log(code)
-                            
-                $.ajax({
-                  type:"GET",
-                  url:"/cart/apply_coupon/",
-                  data:{
-                      'code':code
-                  },
-                  success : function(r){
-                  
-                      $('#total').text("₹"+r.total)
-                      
-                  },
-                  error:function(r){
-                      alert('Error Occured')
-                  }
-              });
+                if(flag == 0) 
+                {
+
+                  $.ajax({
+                    type:"GET",
+                    url:"/cart/apply_coupon/",
+                    data:{
+                        'code':code
+                    },
+                    success : function(r){
+                        
+                        $('#total').text("₹"+r.total)
+                        $('#discount_price').text("-"+r.discount)
+                        Qual.success("Success !","Coupon applied");
+                        
+                    },
+                    error:function(r){
+                      Qual.error("Oh no !","Something wrong happened");
+                    }
+                  });
+                  flag++;
+                  console.log(flag);
+
+                }  
+                else
+                {
+                  console.log('Coupon applied already')
+                  Qual.error("Oh no !","Coupon already applied.");
+                }         
+          
               } 
               
         </script>

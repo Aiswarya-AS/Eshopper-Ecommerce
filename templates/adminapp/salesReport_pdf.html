@@ -149,33 +149,33 @@
 <body>
     <h1>Sales Report</h1>
     <table>
-        <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Order Date</th>
-              <th>Customer</th>
-              <th>Amount</th>
-              <th>Payment Method</th>
-              <th>Order Status</th>
-              <!-- <th>Is Available</th> -->
-            
-              
-            </tr>
-          </thead>
+      <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Order Date</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Payment Method</th>
+            <th>Order Status</th>
+            <!-- <th>Is Available</th> -->
           
-          <tbody>
             
-            {% for o in order %}
-            <tr>
-                <td>{{ o.id }}</td>
-                <td>{{ o.ordered_date }}</td>
-                <td>{{ o.user }}</td>
-                <td>{{ o.price }}</td>
-                <td>{{ o.method }}</td>
-                <td>{{ o.status }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-    </table>
+          </tr>
+        </thead>
+        
+        <tbody>
+          
+          {% for o in order %}
+          <tr>
+              <td>{{ o.id }}</td>
+              <td>{{ o.ordered_date }}</td>
+              <td>{{ o.user }}</td>
+              <td>{{ o.price }}</td>
+              <td>{{ o.method }}</td>
+              <td>{{ o.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+  </table>
 </body>
 </html>

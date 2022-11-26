@@ -208,7 +208,7 @@
                             </div>
                           </div> -->
                           <select name="selectcat" id="selectcat" required>
-                            <option selected="selected" disabled>Categories:</option>
+                            <option selected="selected" value="{{ sub.parent_cat }}" disabled>{{ sub.parent_cat }}</option>
                             {% for c in categories %}
                             <option value="{{ c.id }}">{{ c.cat_name }}</option>
                             {% endfor %}

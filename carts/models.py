@@ -18,6 +18,7 @@ class CartItem(models.Model):
     quantity=models.IntegerField()
     is_active=models.BooleanField(default=True)
     coupon_discount=models.IntegerField(null=True)
+    offer_discount=models.IntegerField(null=True)
 
 
     def sub_total(self):

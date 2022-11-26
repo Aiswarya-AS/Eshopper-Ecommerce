@@ -63,7 +63,24 @@
                     {% for cart_item in cart_items %}
                         <tr >
                         
-                            <td class="align-middle"> <div class="float-left"> <img src="{{ cart_item.product.img1.url }}" alt="" style="width: 50px;">  {{ cart_item.product.product_name }} </div> </td>
+                            <td class="align-middle"> <div class="float-left"> <img src="{{ cart_item.product.img1.url }}" alt="" style="width: 50px;">  {{ cart_item.product.product_name }} </div> <br>
+                                <div class="mt-5" style="width: 10rem;">
+                                    {% if cart_item.variations.all %}
+                                        {% for item in cart_item.variations.all %}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p >Color:{{ item.color.color_value|title }}   </p>
+
+                                            </div> 
+                                            <div class="col-md-6 ">
+                                                <p >Size : {{ item.size.size_value }}</p>
+
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </td>
                             <td class="align-middle">₹{{ cart_item.product.price }}</td>
                             <td class="align-middle">
                                 <!-- <form action="",method="POST">
@@ -121,7 +138,7 @@
                     <a href=""><button class="btn btn-primary">Clear All</button></a> 
                 </div> -->
             </div>
-           
+        
             <div class="col-lg-4">
                 <!-- <form class="mb-5" action="" method="POST">
                     {% csrf_token %}
@@ -135,7 +152,7 @@
                         </div>
                     </div>
                 </form> -->
-               
+        
 
                 
                 <div class="card border-secondary mb-5">

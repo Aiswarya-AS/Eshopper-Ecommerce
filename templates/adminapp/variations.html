@@ -182,8 +182,7 @@
       <!-- partial -->
       <div class="main-panel">        
         <div class="content-wrapper">
-            {% for c in messages %}
-            {{c}} {% endfor %}
+            
           <div class="row">
             <div class="col md-6">
             <div class="col-md-6 grid-margin stretch-card">
@@ -196,7 +195,7 @@
                     <div class="form-group row"style="height:6rem;">
                       <label for="exampleInputUsername2" class="col-sm-3 col-form-label mt-4">Color</label>
                       <div class="col-sm-9 mt-4" >
-                        <input type="text" name="color" class="form-control" id="exampleInputUsername2" placeholder="Color" required>
+                        <input type="text" name="color" class="form-control" id="exampleInputUsername2" placeholder="Color">
                       </div>
                     </div>
                     
@@ -206,6 +205,7 @@
                     <button type="submit" class="btn btn-primary me-2">Submit</button>
                     
                   </form>
+                  {% include 'adminapp/includes/error.html' %}
                 </div>
               </div>
             </div>
@@ -231,7 +231,7 @@
                         </div>
                         <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Size</label>
                         <div class="col-sm-9">
-                          <input type="text" name="size" class="form-control" id="exampleInputUsername2" placeholder="Size" required>
+                          <input type="text" name="size" class="form-control" id="exampleInputUsername2" placeholder="Size" >
                         </div>
                       </div>
                       
@@ -241,7 +241,9 @@
                       <button type="submit" class="btn btn-primary me-2">Submit</button>
                       
                     </form>
+                    {% include 'adminapp/includes/error.html' %}
                   </div>
+
                 </div>
               </div>
         </div>

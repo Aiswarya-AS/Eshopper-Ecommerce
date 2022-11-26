@@ -216,7 +216,7 @@
                             <td>{{ c.category_name }}</td>
                             <td>{{ c.discount }}</td>
                             <td> 
-                                <a href="{% url 'editcategory' c.id %}"><button type="submit" class="btn btn-dark ">Edit</button> </a>
+                                <a href="{% url 'edit_category_offer' c.id %}"><button type="submit" class="btn btn-dark ">Edit</button> </a>
                                 <a href="{% url 'deletecategory' c.id %}"><button onclick=delcategory() type="button" class="btn btn-danger mx-2">Delete</button> </td></a>
                           </tr>
                           <!-- <div id="myModal" class="modal fade">

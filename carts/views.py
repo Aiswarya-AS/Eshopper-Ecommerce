@@ -33,21 +33,61 @@ def add_cart(request,product_id):
 
         try:
             variation=Variations.objects.get(product=product,color=c,size=s)
-            print(variation,"................................")
             product_variation.append(variation)
         except:
             pass
 
     if current_user.is_authenticated:
-        try:
-            cart_item=CartItem.objects.get(product=product,user=current_user)
-            if len(product_variation) >0:
-                cart_item.variations.clear()
-                for item in product_variation:
-                    cart_item.variations.add(item)
-            cart_item.quantity+=1
-            cart_item.save()
-        except CartItem.DoesNotExist:
+        
+        # try:
+        #     cart_item=CartItem.objects.create(product=product,quantity=1,user=current_user)
+        #     if len(product_variation) >0:
+        #         cart_item.variations.clear()
+        #         for item in product_variation:
+        #             cart_item.variations.add(item)
+        #             # cart_item.save()
+            
+        #     cart_item.save()
+        # except CartItem.DoesNotExist:
+        #     cart_item=CartItem.objects.create(
+        #         product=product,
+        #         quantity=1,
+        #         user=current_user,
+
+        #     )
+        #     if len(product_variation) > 0:
+        #         cart_item.variations.clear()
+        #         for item in product_variation:
+        #             cart_item.variations.add(item)
+        #     cart_item.save()
+   
+        is_cart_item_exists=CartItem.objects.filter(product=product,user=current_user).exists()
+        if is_cart_item_exists:
+            cart_item=CartItem.objects.filter(product=product,user=current_user)
+
+            ex_var_list=[]
+            id=[]
+
+            for item in cart_item:
+                exsisting_varation=item.variations.all()
+                ex_var_list.append(list(exsisting_varation))
+                id.append(item.id)
+
+            if product_variation in ex_var_list:
+                index=ex_var_list.index(product_variation)
+                item_id=id[index]
+                item = CartItem.objects.get(product=product,id=item_id)
+                item.quantity+=1
+                item.save()
+            else:
+                item=CartItem.objects.create(product=product,quantity=1,user=current_user)
+                if len(product_variation) > 0:
+                    item.variations.clear()
+                    
+                    item.variations.add(*product_variation)
+                # cart_item.quantity+=1
+                item.save()
+        else:
             cart_item=CartItem.objects.create(
                 product=product,
                 quantity=1,
@@ -56,9 +96,10 @@ def add_cart(request,product_id):
             )
             if len(product_variation) >0:
                 cart_item.variations.clear()
-                for item in product_variation:
-                    cart_item.variations.add(item)
-        cart_item.save()
+                
+                cart_item.variations.add(*product_variation)
+            cart_item.save()
+        
         
         return HttpResponseRedirect(request.META["HTTP_REFERER"])
     else:
@@ -70,16 +111,33 @@ def add_cart(request,product_id):
                 cart_id=_cart_id(request)
             )
         cart.save()
+        is_cart_item_exists=CartItem.objects.filter(product=product,cart=cart).exists()
+        if is_cart_item_exists:
+            cart_item=CartItem.objects.filter(product=product,cart=cart)
 
-        try:
-            cart_item=CartItem.objects.get(product=product,cart=cart)
-            if len(product_variation) >0:
-                cart_item.variations.clear()
-                for item in product_variation:
-                    cart_item.variations.add(item)
-            cart_item.quantity+=1
-            cart_item.save()
-        except CartItem.DoesNotExist:
+            ex_var_list=[]
+            id=[]
+
+            for item in cart_item:
+                exsisting_varation=item.variations.all()
+                ex_var_list.append(list(exsisting_varation))
+                id.append(item.id)
+
+            if product_variation in ex_var_list:
+                index=ex_var_list.index(product_variation)
+                item_id=id[index]
+                item = CartItem.objects.get(product=product,id=item_id)
+                item.quantity+=1
+                item.save()
+            else:
+                item=CartItem.objects.create(product=product,quantity=1,cart=cart)
+                if len(product_variation) > 0:
+                    item.variations.clear()
+                    
+                    item.variations.add(*product_variation)
+                # cart_item.quantity+=1
+                item.save()
+        else:
             cart_item=CartItem.objects.create(
                 product=product,
                 quantity=1,
@@ -88,9 +146,9 @@ def add_cart(request,product_id):
             )
             if len(product_variation) >0:
                 cart_item.variations.clear()
-                for item in product_variation:
-                    cart_item.variations.add(item)
-        cart_item.save()
+                
+                cart_item.variations.add(*product_variation)
+            cart_item.save()
         
         return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
@@ -157,7 +215,7 @@ def delete_cart_item(request,product_id):
     
     product=get_object_or_404(Product,id=product_id)
     if request.user.is_authenticated:
-            cart_item=CartItem.objects.get(product=product,user=request.user)
+        cart_item=CartItem.objects.filter(product=product,user=request.user)
     else:
         cart=Cart.objects.get(cart_id=_cart_id(request))
         cart_item=CartItem.objects.get(product=product,cart=cart)
@@ -174,6 +232,7 @@ def checkout(request,total=0,quantity=0):
                 total+=(offer_price["new_price"]*cart_item.quantity)
         else:
             total+=(cart_item.product.price*cart_item.quantity)
+        
     
         quantity+=cart_item.quantity
 
@@ -212,6 +271,7 @@ def decrease_quantity(request):
             total=round(total,2)
         else:
             total+=(cart_item.product.price*cart_item.quantity)
+        cart_item.offer_discount=total
         cart_item.save()
         sub_total=cart_item.sub_total()
         saved=total_price-total
@@ -232,7 +292,7 @@ def increase_quantity(request):
 
 
     if request.user.is_authenticated:
-            cart_item=CartItem.objects.get(product=product,user=request.user)
+        cart_item=CartItem.objects.get(product=product,user=request.user)
     else:
         cart=Cart.objects.get(cart_id=_cart_id(request))
         cart_item=CartItem.objects.get(product=product,cart=cart)
@@ -249,6 +309,7 @@ def increase_quantity(request):
             total=round(total,2)
         else:
             total+=(cart_item.product.price*cart_item.quantity)
+        cart_item.offer_discount=total
         cart_item.save()
         sub_total=cart_item.sub_total()
         you_saved=total_price-total
@@ -265,25 +326,28 @@ def increase_quantity(request):
 
 
 def apply_coupon(request):
-    
-    cart_item=CartItem.objects.get(user=request.user)
     total=0
-    if cart_item.product.offer_price():
+    cart_items=CartItem.objects.filter(user=request.user,is_active=True)
+    for cart_item in cart_items:
+        if cart_item.product.offer_price():
             offer_price=Product.offer_price(cart_item.product)
             total+=(offer_price["new_price"]*cart_item.quantity)
-            total=round(total,2)
-    else:
-        total+=(cart_item.product.price*cart_item.quantity)
-    print(total)
+        else:
+            total+=(cart_item.product.price*cart_item.quantity)
     if request.method=='GET':
         code=request.GET.get('code')
         coupon=Coupon.objects.get(code=code)
-        total=total-coupon.discount
-        cart_item.coupon_discount=total
-        cart_item.save()
+        today=date.today()
+        if coupon.valid_from <= today and coupon.valid_to >= today:
+            
+            total-=coupon.discount
+            cart_item.coupon_discount=total
+            cart_item.save()
+        
     # return redirect('checkout')
     return JsonResponse({
         'total':total,
+        'discount':coupon.discount
     })
 
 

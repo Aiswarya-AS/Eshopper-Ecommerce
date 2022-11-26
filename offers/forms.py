@@ -15,7 +15,7 @@ class CategoryOfferForm(ModelForm):
             {"class":"form-control","placeholder":"Select Category"}
         )
         self.fields["discount"].widget.attrs.update(
-            {"class":"form-control","placeholder":"Enter Discount Amount"}
+            {"class":"form-control","placeholder":"Enter Discount Percentage"}
         )
 
 
@@ -30,7 +30,7 @@ class SubcategoryOfferForm(ModelForm):
             {"class":"form-control","placeholder":"Select SubCategory"}
         )
         self.fields["discount"].widget.attrs.update(
-            {"class":"form-control","placeholder":"Enter Discount Amount"}
+            {"class":"form-control","placeholder":"Enter Discount Percentage"}
         )
 
 
@@ -45,7 +45,7 @@ class ProductOfferForm(ModelForm):
             {"class":"form-control","placeholder":"Select Product"}
         )
         self.fields["discount"].widget.attrs.update(
-            {"class":"form-control","placeholder":"Enter Discount Amount"}
+            {"class":"form-control","placeholder":"Enter Discount Percentage"}
         )
 
 
