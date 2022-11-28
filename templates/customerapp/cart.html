@@ -90,7 +90,7 @@
                                             <!-- <button onclick="minusBtn({{ cart_item.id }} , {{ cart_item.product.id }})" class="btn btn-sm btn-primary btn-minus" >
                                                 <i class="fa fa-minus"></i>
                                             </button> -->
-                                            
+                                           
                                             <button class="btn btn-sm btn-primary btn-minus" onclick= 'decereseQuantity("quantity_value{{ forloop.counter }}","{{ cart_item.product.id }}","sub_total{{ forloop.counter }}")' ><i class="fa fa-minus"></i></button>
                                             
                                         </div>
@@ -126,7 +126,7 @@
                                     </div>
                                     <div class="modal-footer justify-content-center">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                        <a href="{% url 'delete_cart_item' cart_item.product.id %}"> <button class="btn btn-sm btn-primary">Yes</button></a>
+                                        <a href="{% url 'delete_cart_item' cart_item.product.id cart_item.id %}"> <button class="btn btn-sm btn-primary">Yes</button></a>
                                     </div>
                                 </div>
                             </div>

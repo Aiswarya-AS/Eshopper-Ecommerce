@@ -21,6 +21,7 @@ import xlwt
 from offers.forms import CategoryOfferForm,SubcategoryOfferForm,ProductOfferForm,CouponForm
 from offers.models import CategoryOffer,SubcategoryOffer,ProductOffer,Coupon
 from category.models import Color,Size,Variations
+from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
 # Create your views here.
 
 
@@ -440,15 +441,13 @@ def add_variations(request,id):
     if request.method=="POST":
         c=request.POST.get('selectcolor')
         s=request.POST.get('selectsize')
-        if Variations.objects.get(product=product,color=c,size=s).exists():
-            print('This already exists!!!')
-        else:
-            vari=Variations()
-            vari.product_id=product.id
-            vari.color_id=c
-            vari.size_id=s
-            vari.save()
-            messages.success(request,'added')
+        
+        vari=Variations()
+        vari.product_id=product.id
+        vari.color_id=c
+        vari.size_id=s
+        vari.save()
+        messages.success(request,'added')
     return render(request,'adminapp/add_variations.html',{
         
         'colors':colors,
@@ -663,10 +662,15 @@ def product_offer(request):
 def add_subcategory_offer(request):
     form=SubcategoryOfferForm()
     if request.method=='POST':
-        form=SubcategoryOfferForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('subcategory_offer')
+        discount=form.data['discount']
+        if int(discount) <= 70:
+            form=SubcategoryOfferForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('subcategory_offer')
+        else:
+            messages.error(request,'Percentage should be less than or equal to 70')
+            return redirect('add_subcategory_offer')   
     context={
         'form':form
     }
@@ -675,10 +679,15 @@ def add_subcategory_offer(request):
 def add_product_offer(request):
     form=ProductOfferForm()
     if request.method=='POST':
-        form=ProductOfferForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('product_offer')
+        discount=form.data['discount']
+        if int(discount) <= 70:
+            form=ProductOfferForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('product_offer')
+        else:
+            messages.error(request,'Percentage should be less than or equal to 70')
+            return redirect('add_product_offer')
     context={
         'form':form
     }
@@ -744,9 +753,11 @@ def salesReport(request):
 
             }
             new_order_list.append(item)
-        
+    paginator=Paginator(new_order_list,10)
+    page=request.GET.get('page')
+    paged_orders_list=paginator.get_page(page)    
     return render(request,'adminapp/salesReport.html',{
-        'order':new_order_list,
+        'order':paged_orders_list,
     })
 
 def by_date(request):

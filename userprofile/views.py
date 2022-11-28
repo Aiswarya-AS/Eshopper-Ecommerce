@@ -4,6 +4,8 @@ from django.urls import reverse
 from userprofile.models import Address
 from .forms import UserAddressForm
 from django.contrib.auth.decorators import login_required
+from accounts.models import CustomUser
+from customerapp.forms import RegistrationForm
 # Create your views here.
 @login_required(login_url='login-page')
 def view_address(request):
@@ -41,3 +43,15 @@ def edit_address(request,id):
 def delete_address(request,id):
     address=get_object_or_404(Address, id = id).delete()
     return redirect('view_address')
+
+def edit_profile(request):
+    user=CustomUser.objects.get(id=request.user.id)
+    form=RegistrationForm(instance=user)
+    if request.method =='POST':
+        form=RegistrationForm(request.POST,instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('my_profile')
+
+    
+    return render(request,'customerapp/edit_details.html')

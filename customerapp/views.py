@@ -68,10 +68,12 @@ def store(request,category_slug=None,subcategory_slug=None):
     categories=None
     if category_slug!=None:
         categories=get_object_or_404(Category,slug=category_slug)
+
         products=Product.objects.filter(category=categories)
         paginator=Paginator(products,2)
         page=request.GET.get('page')
         paged_products=paginator.get_page(page)
+        
     elif category_slug and subcategory_slug!=None:
         subcategories=get_object_or_404(Subcategory,slug=subcategory_slug)
         products=Product.objects.filter(subcategory=subcategories,category=category_slug)
@@ -215,15 +217,37 @@ def login_pass(request):
 
             if user.is_superuser==False:
                 try:
-                    
                     cart=Cart.objects.get(cart_id=_cart_id(request))
                     is_cart_item_exists=CartItem.objects.filter(cart=cart).exists()
                     
                     if is_cart_item_exists:
                         cart_item=CartItem.objects.filter(cart=cart)
+                        product_variation = []
                         for item in cart_item:
-                            item.user=user
-                            item.save()
+                            variation=item.variations.all()
+                            product_variation.append(list(variation))
+                        cart_item = CartItem.objects.filter(user=user)
+                        ex_var_list = []
+                        id = []
+                        for item in cart_item:
+                            existing_variations = item.variations.all()
+                            ex_var_list.append(list(existing_variations))
+                            id.append(item.id)
+
+
+                        for pr in product_variation:
+                            if pr in ex_var_list:
+                                index = ex_var_list.index(pr)
+                                item_id = id[index]
+                                item = CartItem.objects.get(id=item_id)
+                                item.quantity = item.quantity + 1
+                                item.user = user
+                                item.save()
+                            else:
+                                cart_item = CartItem.objects.filter(cart=cart)
+                                for item in cart_item:
+                                    item.user = user
+                                    item.save()
                 except:
                     pass
                 if user.is_superuser==False:
@@ -267,4 +291,47 @@ def load_size_user(request):
     size=Size.objects.filter(color=color).all()
     return render(request,'customerapp/user-size-dropdown.html',{
         'size':size
+    })
+
+def change_password(request):
+    if request.method=='POST':
+        current_password=request.POST.get('current_password')
+        new_password=request.POST.get('new_password')
+        confirm_password=request.POST.get('confirm_password')
+
+        user=CustomUser.objects.get(first_name__exact=request.user.first_name)
+
+        if new_password == confirm_password:
+            success=user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                messages.success('Password Changed Succesfully')
+                return redirect('my_profile')
+            else:
+                messages.error(request, "Your Existing Password Is Incorrect")
+                return redirect("my_profile")
+        else:
+            messages.info(request, "Password Does Not Match!")
+            return redirect("my_profile")
+    return redirect('my_profile')
+
+from django.db.models import Q
+def filter_price(request):
+    selected=request.GET.get('gridRadios')
+    if int(selected) == 1:
+        products=Product.objects.filter(Q(price__lte = 100 ))
+    elif int(selected) == 2:
+        products=Product.objects.filter(Q(price__gte = 100,price__lte=500 ))
+    elif int(selected) == 3:
+        products=Product.objects.filter(Q(price__gte = 500,price__lte=1000 ))
+    elif int(selected) == 4:
+        products=Product.objects.filter(Q(price__gte = 1000,price__lte=5000 ))
+    elif int(selected) == 5:
+        products=Product.objects.filter(Q(price__gte = 5000,price__lte=10000 ))
+    else:
+        products=Product.objects.filter(Q(price__gte = 10000  ))
+
+
+    return render(request,'customerapp/filter_store.html',{
+        'products':products
     })

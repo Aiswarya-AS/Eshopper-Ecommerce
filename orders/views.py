@@ -9,17 +9,19 @@ from carts.models import CartItem
 from category.models import Product
 from orders.models import Order, OrderItem
 from django.contrib import messages
-from offers.models import Coupon,ReviewCoupon
+from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
+
 # Create your views here.
 
 @login_required(login_url='login-page')
 def order_summary(request):
     orders=Order.objects.filter(user=request.user).order_by('created_at')[::-1]
-    print(orders)
-    # order_items=OrderItem.objects.filter(order=orders)
+    paginator=Paginator(orders,8)
+    page=request.GET.get('page')
+    paged_orders=paginator.get_page(page)
     return render(request,'customerapp/ordersummary.html',{
-        # 'order_items':order_items,
-        'orders':orders,
+        
+        'orders':paged_orders,
     })
 def orderview(request,id):
     orders=Order.objects.filter(id=id).filter(user=request.user).first()

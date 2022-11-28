@@ -27,7 +27,6 @@ class ProductOffer(models.Model):
 class Coupon(models.Model):
     coupon_name = models.CharField(max_length=25)
     code = models.CharField(max_length=25, unique=True)
-    coupon_limit = models.IntegerField()
     valid_from = models.DateField()
     valid_to = models.DateField()
     discount = models.IntegerField(

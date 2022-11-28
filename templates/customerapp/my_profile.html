@@ -51,7 +51,7 @@
             <div class="col-md-4">
                 <div class="card" style="width: 18rem;">
                     <ul class="list-group list-group-flush">
-                       <a href=""style="text-decoration: none;"><li class="list-group-item">My Wishlist</li></a> 
+                       <a href="{% url 'user_wishlist' %}"style="text-decoration: none;"><li class="list-group-item">My Wishlist</li></a> 
                        <a href="{% url 'order_summary' %}"style="text-decoration: none;"> <li class="list-group-item">My Orders</li></a>
                        <a href="{% url 'view_address'  %}" style="text-decoration: none;"><li class="list-group-item">My Address</li></a> 
                     </ul>
@@ -77,12 +77,42 @@
                           <p class="card-text"><h6>Email Address: <span>{{request.user.email}}</span> </h6></p>
                           <p class="card-text"><h6>Phone Number: <span>{{request.user.phone}}</span> </h6></p>
 
+
+                          <div class="text-center">
+                            <a href="{% url 'edit_profile' %}"  style="color:green;" class="btn btn-default btn-rounded mb-4" >
+                              Edit Profile</a>
+                          </div>
                           
                         </div>
                       </div>
                     </div>
                   </div>
+                  <div class="col-md-6">
+                    <h5>Change Passsword</h5>
+                  </div>
+                  <form class="form-inline mt-3" action="{% url 'change_password' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group mx-sm-3 mb-2">
+                      <label for="inputPassword2" class="sr-only">Password</label>
+                      <input type="password" class="form-control" name="current_passowrd" id="inputPassword2" placeholder="Current Password">
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                      <label for="inputPassword2" class="sr-only">Password</label>
+                      <input type="password" class="form-control" name="new_password" id="inputPassword2" placeholder=" Password">
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2 mt-4" style="padding-left: 6rem;">
+                      <label for="inputPassword2" class="sr-only">Password</label>
+                      <input type="password" class="form-control" name="confirm_password" id="inputPassword2" placeholder="Confirm Password">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Reset</button>
+                  </form>
+                  {% for p_c in messages %}
+                  <p style="color:red;"> {{ p_c }}</p>
+                  {% endfor %}
             </div>
+            
+
+
         </div>
     </div>
 
