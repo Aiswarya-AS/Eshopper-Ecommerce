@@ -90,7 +90,7 @@
                                             <!-- <button onclick="minusBtn({{ cart_item.id }} , {{ cart_item.product.id }})" class="btn btn-sm btn-primary btn-minus" >
                                                 <i class="fa fa-minus"></i>
                                             </button> -->
-                                           
+                                        
                                             <button class="btn btn-sm btn-primary btn-minus" onclick= 'decereseQuantity("quantity_value{{ forloop.counter }}","{{ cart_item.product.id }}","sub_total{{ forloop.counter }}")' ><i class="fa fa-minus"></i></button>
                                             
                                         </div>
@@ -134,24 +134,11 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <!-- <div class="input-group-append mt-5 float-right">
-                    <a href=""><button class="btn btn-primary">Clear All</button></a> 
-                </div> -->
+                
             </div>
         
             <div class="col-lg-4">
-                <!-- <form class="mb-5" action="" method="POST">
-                    {% csrf_token %}
-                    {% for i in messages %}
-                    <p class="pl-3"style="color:red;">{{i}}</p>
-                    {% endfor %}
-                    <div class="input-group">
-                        <input type="text" name="coupon"class="form-control p-4" placeholder="Coupon Code">
-                        <div class="input-group-append">
-                            <button type="submit"class="btn btn-primary">Apply Coupon</button>
-                        </div>
-                    </div>
-                </form> -->
+            
         
 
                 

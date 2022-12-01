@@ -187,7 +187,7 @@
             <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Add Category Offer Here</h4>
+                  <h4 class="card-title">Add SubCategory Offer Here</h4>
                   <p class="card-description">
                     Category Offer
                   </p>
@@ -202,7 +202,6 @@
                       <div class="col-sm-9 mt-4">
                           {{ form.discount.label }}
                           {{ form.discount }}
-                        <!-- <input type="text" name="catname" class="form-control" id="exampleInputUsername2" placeholder="Category Name" required> -->
                       </div>
                     </div>
                     
@@ -212,6 +211,8 @@
                     <button type="submit" class="btn btn-primary me-2">Submit</button>
                     
                   </form>
+                  {% include 'adminapp/includes/error.html' %}
+
                 </div>
               </div>
             </div>

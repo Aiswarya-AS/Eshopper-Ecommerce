@@ -193,7 +193,7 @@
                   <div class="card-body">
                     <h4 class="card-title text-center">SubCategory Offers</h4>
                     <p class="card-description">
-                        <a href="{% url 'add_subcategory_offer' %}"><button type="button" class="btn btn-dark btn-md btn-block float-right">Add Category Offer</button></a> 
+                        <a href="{% url 'add_subcategory_offer' %}"><button type="button" class="btn btn-dark btn-md btn-block float-right">Add SubCategory Offer</button></a> 
 
                     </p>
                     <div class="table-responsive">
@@ -216,8 +216,8 @@
                             <td>{{ s.subcategory_name }}</td>
                             <td>{{ s.discount }}</td>
                             <td> 
-                                <a href=""><button type="submit" class="btn btn-dark ">Edit</button> </a>
-                                <a href=""><button  type="button" class="btn btn-danger mx-2">Delete</button> </td></a>
+                                <a href="{% url 'edit_subcategory_offer' s.id %}"><button type="submit" class="btn btn-dark ">Edit</button> </a>
+                                <a href="{% url 'delete_subcategory_offer' s.id %}" onclick="delSubOffer()"  type="button" class="btn btn-danger mx-2">Delete </td></a>
                           </tr>
                            
 
@@ -247,5 +247,27 @@
     </div>
     <!-- page-body-wrapper ends -->
   </div>
+  <script>
+    function delSubOffer() {
+      event.preventDefault();
+      var dlt = event.currentTarget.href
+      console.log(dlt)
+      Swal.fire({
+        title: 'Are you sure want to delete?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#2DAD49',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Back',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          
+          window.location = dlt;
+        }
+      })
+    }
+  </script>
 
  {% endblock %}

@@ -197,6 +197,7 @@
 
                     </p>
                     <div class="table-responsive">
+                      {% if categories %}
                       <table class="table">
                         <thead>
                           <tr>
@@ -217,28 +218,14 @@
                                 <a href="{% url 'editcategory' c.id %}"><button type="submit" class="btn btn-dark ">Edit</button> </a>
                                 <a href="{% url 'deletecategory' c.id %}" onclick="delcategory()" type="button" class="btn btn-danger mx-2">Delete</a> </td>
                           </tr>
-                          <!-- <div id="myModal" class="modal fade">
-                            <div class="modal-dialog modal-confirm">
-                                <div class="modal-content">
-                                    <div class="modal-header flex-column">
-                                    
-                                        <h4 class="modal-title w-100">Are you sure?</h4>	
-                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Do you really want to delete these records? This process cannot be undone.</p>
-                                    </div>
-                                    <div class="modal-footer justify-content-center">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                        <a href="{% url 'deletecategory' c.id %}"><button type="button" class="btn btn-danger mx-2">Delete</button></a> 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>  -->
+            
 
                           {% endfor %}
                         </tbody>
                       </table>
+                      {% else %}
+                      <h4 class="text-center mt-3">No Categories found!!</h4>
+                      {% endif %}
                     </div>
                   </div>
                 </div>

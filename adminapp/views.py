@@ -21,7 +21,9 @@ import xlwt
 from offers.forms import CategoryOfferForm,SubcategoryOfferForm,ProductOfferForm,CouponForm
 from offers.models import CategoryOffer,SubcategoryOffer,ProductOffer,Coupon
 from category.models import Color,Size,Variations
-from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
+from django.core.paginator import Paginator
+import io
+from docxtpl import DocxTemplate
 # Create your views here.
 
 
@@ -340,7 +342,7 @@ def add_product(request):
     return redirect('addingproduct')
 
 
-
+@login_required(login_url='adminlogin')
 def edit_product(request,id):
     product=Product.objects.get(id=id)
     if request.method=='POST':
@@ -387,7 +389,8 @@ def delete_product(request,id):
 
 
 
-
+# Product variation
+@login_required(login_url='adminlogin')
 def add_size(request):
     if request.method=="POST":
         if request.POST.get('selectcolor') and request.POST.get('size'):
@@ -408,7 +411,7 @@ def add_size(request):
             return redirect('variations')
 
 
-
+@login_required(login_url='adminlogin')
 def add_color(request):
     if request.method=='POST':
         if request.POST['color']:
@@ -426,14 +429,14 @@ def add_color(request):
             messages.error(request,'Required all fields!!')
             return redirect('variations')
 
-
+@login_required(login_url='adminlogin')
 def variations(request):
     color=Color.objects.all()
     return render(request,'adminapp/variations.html',{
         'color':color
         })
 
-
+@login_required(login_url='adminlogin')
 def add_variations(request,id):
     product=Product.objects.get(id=id)
     colors=Color.objects.all()
@@ -455,7 +458,7 @@ def add_variations(request,id):
     })
 
 
-
+@login_required(login_url='adminlogin')
 def load_size(request):
     color=request.GET.get('color_id')
 
@@ -465,7 +468,8 @@ def load_size(request):
     })
 
 
-
+# Order Management
+@login_required(login_url='adminlogin')
 def orders(request):
     orders=Order.objects.all()
     order_items=OrderItem.objects.all()
@@ -476,7 +480,7 @@ def orders(request):
     return render(request,'adminapp/orders.html',context)
 
 
-
+@login_required(login_url='adminlogin')
 def order_items(request):
     order_items=OrderItem.objects.order_by("-id").all()
     context={
@@ -485,7 +489,8 @@ def order_items(request):
     }
     return render(request,'adminapp/orderitems.html',context)
 
-
+# Offer Managment
+@login_required(login_url='adminlogin')
 def category_offer(request):
     cat_offer=CategoryOffer.objects.all()
     return render(request,'adminapp/category_offer.html',{
@@ -494,7 +499,7 @@ def category_offer(request):
 
 
 
-
+@login_required(login_url='adminlogin')
 def add_category_offer(request):
     form=CategoryOfferForm()
     if request.method=='POST':
@@ -516,29 +521,177 @@ def add_category_offer(request):
     return render(request,'adminapp/add_category_offer.html',context)
 
 
-
+@login_required(login_url='adminlogin')
 def edit_category_offer(request,id):
-    form=CategoryOfferForm()
     category_offer=get_object_or_404(CategoryOffer,id=id)
-    
-
-    form=CategoryOfferForm(request.POST,instance=category_offer)
+    form=CategoryOfferForm(request.POST or None,instance=category_offer)
     if form.is_valid():
         form.save()
         return redirect('category_offer')
-
+    else:
+        messages.error(request,"Please fill all fields *(discount should less than 70)")
     return render(request,'adminapp/edit_category_offer.html',{
         'form':form
     })
 
 
+def delete_category_offer(request,id):
+    cat_offer=get_object_or_404(CategoryOffer,id=id)
+    cat_offer.delete()
+    messages.error(request,'Deleted')
+    return redirect('category_offer')
+
+@login_required(login_url='adminlogin')
+def subcategory_offer(request):
+    sub_offer=SubcategoryOffer.objects.all()
+    return render(request,'adminapp/subcategory_offer.html',{
+        'sub_offer':sub_offer
+    })
+
+
+@login_required(login_url='adminlogin')
+def add_subcategory_offer(request):
+    form=SubcategoryOfferForm()
+    if request.method=='POST':
+        form=SubcategoryOfferForm(request.POST)
+        discount=form.data['discount']
+        if int(discount) <= 70:
+            form=SubcategoryOfferForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('subcategory_offer')
+        else:
+            messages.error(request,'Percentage should be less than or equal to 70')
+            return redirect('add_subcategory_offer')   
+    context={
+        'form':form
+    }
+    return render(request,'adminapp/add_subcategory_offer.html',context)
+
+
+@login_required(login_url='adminlogin')
+def edit_subcategory_offer(request,id):
+    subcategory_offer=get_object_or_404(SubcategoryOffer,id=id)
+    form=SubcategoryOfferForm(request.POST or None,instance=subcategory_offer)
+    if form.is_valid():
+        form.save()
+        return redirect('subcategory_offer')
+    else:
+        messages.error(request,'Percentage should be less than or equal to 70')
+        
+    return render(request,'adminapp/edit_subcategory_offer.html',{
+        'form':form
+    })
+
+
+def delete_subcategory_offer(request,id):
+    sub_offer=get_object_or_404(SubcategoryOffer,id=id)
+    sub_offer.delete()
+    messages.error(request,'Deleted')
+    return redirect('subcategory_offer')
+
+
+@login_required(login_url='adminlogin')
+def product_offer(request):
+    product_offer=ProductOffer.objects.all()
+    return render(request,'adminapp/product_offer.html',{
+        'product_offer':product_offer
+    })
+
+
+@login_required(login_url='adminlogin')
+def add_product_offer(request):
+    form=ProductOfferForm()
+    if request.method=='POST':
+        form=ProductOfferForm(request.POST)
+        discount=form.data['discount']
+        if int(discount) <= 70:
+            form=ProductOfferForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('product_offer')
+        else:
+            messages.error(request,'Percentage should be less than or equal to 70')
+            return redirect('add_product_offer')
+    context={
+        'form':form
+    }
+    return render(request,'adminapp/add_product_offer.html',context)
+
+
+@login_required(login_url='adminlogin')
+def edit_product_offer(request,id):
+    product_offer=get_object_or_404(ProductOffer,id=id)
+    form=ProductOfferForm(request.POST or None,instance=product_offer)
+    if form.is_valid():
+        form.save()
+        return redirect('product_offer')
+    else:
+        messages.error(request,'Percentage should be less than or equal to 70')
+    return render(request,'adminapp/edit_product_offer.html',{
+        'form':form
+    })
 
 
 
+def delete_product_offer(request,id):
+    pro_offer=get_object_or_404(ProductOffer,id=id)
+    pro_offer.delete()
+    messages.error(request,'Deleted')
+    return redirect('product_offer')
+
+
+@login_required(login_url='adminlogin')
+def coupons(request):
+    coupons=Coupon.objects.all()
+    return render(request,'adminapp/coupons.html',{
+        'coupons':coupons
+    })
+
+
+@login_required(login_url='adminlogin')
+def add_coupons(request):
+    form=CouponForm()
+    if request.method=='POST':
+        form=CouponForm(request.POST)
+        discount=form.data['discount']
+        if int(discount) <= 70:
+            if form.is_valid():
+                form.save()
+                return redirect('coupons')
+        else:
+            messages.error(request,'Percentage should be less than or equal to 70')
+            return redirect('add_coupons')
+    return render(request,'adminapp/add_coupons.html',{
+        'form':form
+    })
+
+
+@login_required(login_url='adminlogin')
+def edit_coupons(request,id):
+    coupon=get_object_or_404(Coupon,id=id)
+    form=CouponForm(request.POST or None,instance=coupon)
+    if form.is_valid():
+        form.save()
+        return redirect('coupons')
+    else:
+        messages.error(request,'Percentage should be less than or equal to 70')
+    return render(request,'adminapp/edit_coupon.html',{
+        'form':form
+    })
+
+
+def delete_coupons(request,id):
+    coupon=get_object_or_404(Coupon,id=id)
+    coupon.delete()
+    messages.error(request,'Deleted')
+    return redirect('coupons')
+
+
+# Report
+@login_required(login_url='adminlogin')
 def product_report(request):
     products=Product.objects.all()
-    
-
     if request.GET.get('from'):
         product_date_from=datetime.datetime.strptime(request.GET.get('from'),"%Y-%m-%d")
         product_date_to=datetime.datetime.strptime(request.GET.get('to'),"%Y-%m-%d")
@@ -550,7 +703,6 @@ def product_report(request):
         
         
     })
-
 
 
 
@@ -598,6 +750,8 @@ class generateProductPdf(View):
         pdf=render_to_pdf('adminapp/product_pdf.html',data)
         return HttpResponse(pdf,content_type='application/pdf')
 
+
+
 def render_to_pdf(template_src,context_dict={}):
     template=get_template(template_src)
     html=template.render(context_dict)
@@ -606,6 +760,8 @@ def render_to_pdf(template_src,context_dict={}):
     if not pdf.err:
         return HttpResponse(result.getvalue(),content_type='application/pdf')
     return None
+
+
 
 def product_excel(request):
     response=HttpResponse(content_type='application/ms-excel')
@@ -642,99 +798,8 @@ def product_excel(request):
     return response
 
 
-    
 
-
-
-def subcategory_offer(request):
-    sub_offer=SubcategoryOffer.objects.all()
-    return render(request,'adminapp/subcategory_offer.html',{
-        'sub_offer':sub_offer
-    })
-
-def product_offer(request):
-    product_offer=ProductOffer.objects.all()
-    return render(request,'adminapp/product_offer.html',{
-        'product_offer':product_offer
-    })
-
-
-def add_subcategory_offer(request):
-    form=SubcategoryOfferForm()
-    if request.method=='POST':
-        discount=form.data['discount']
-        if int(discount) <= 70:
-            form=SubcategoryOfferForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('subcategory_offer')
-        else:
-            messages.error(request,'Percentage should be less than or equal to 70')
-            return redirect('add_subcategory_offer')   
-    context={
-        'form':form
-    }
-    return render(request,'adminapp/add_subcategory_offer.html',context)
-
-def add_product_offer(request):
-    form=ProductOfferForm()
-    if request.method=='POST':
-        discount=form.data['discount']
-        if int(discount) <= 70:
-            form=ProductOfferForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('product_offer')
-        else:
-            messages.error(request,'Percentage should be less than or equal to 70')
-            return redirect('add_product_offer')
-    context={
-        'form':form
-    }
-    return render(request,'adminapp/add_product_offer.html',context)
-
-
-
-
-
-
-def edit_subcategory_offer(request):
-    pass
-def edit_product_offer(request):
-    pass
-
-def delete_category_offer(request):
-    pass
-
-def delete_subcategory_offer(request):
-    pass
-
-def delete_product_offer(request):
-    pass
-
-def coupons(request):
-    coupons=Coupon.objects.all()
-    return render(request,'adminapp/coupons.html',{
-        'coupons':coupons
-    })
-
-
-def add_coupons(request):
-    form=CouponForm()
-    if request.method=='POST':
-        form=CouponForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('coupons')
-    else:
-        print('error')
-    
-    return render(request,'adminapp/add_coupons.html',{
-        'form':form
-    })
-
-
-
+@login_required(login_url='adminlogin')
 def salesReport(request):
     orders=Order.objects.all()
     new_order_list=[]
@@ -760,6 +825,8 @@ def salesReport(request):
         'order':paged_orders_list,
     })
 
+
+@login_required(login_url='adminlogin')
 def by_date(request):
     if request.GET.get('from'):
         sales_date_from=datetime.datetime.strptime(request.GET.get('from'),"%Y-%m-%d")
@@ -768,26 +835,32 @@ def by_date(request):
         sales_date_to+=datetime.timedelta(days=1)
         orders=Order.objects.filter(created_at__range=[sales_date_from,sales_date_to])
 
-    new_order_list=[]
+        new_order_list=[]
 
-    for i in orders:
-        order_items=OrderItem.objects.filter(order_id=i.id)
-        for j in order_items:
-            item={
-                'id':i.id,
-                'ordered_date':i.created_at,
-                'user':i.user,
-                'price':j.price,
-                'method':i.payment_mode,
-                'status':j.status,
+        for i in orders:
+            order_items=OrderItem.objects.filter(order_id=i.id)
+            for j in order_items:
+                item={
+                    'id':i.id,
+                    'ordered_date':i.created_at,
+                    'user':i.user,
+                    'price':j.price,
+                    'method':i.payment_mode,
+                    'status':j.status,
 
 
-            }
-            new_order_list.append(item)
+                }
+                new_order_list.append(item)
+    else:
+        messages.error(request,'Select fields before submitting..!! ')
+        return redirect('salesReport')
         
     return render(request,'adminapp/salesReport.html',{
         'order':new_order_list,
     })
+
+
+
 
 class generatesalesReportPdf(View):
     def get(self,request,*args,**kwargs):
@@ -819,38 +892,9 @@ class generatesalesReportPdf(View):
         return HttpResponse(pdf,content_type='application/pdf')
 
 
-# def product_sales_report(request):
-#     if request.GET.get('from'):
-#         sales_date_from=datetime.datetime.strptime(request.GET.get('from'),"%Y-%m-%d")
-#         sales_date_to=datetime.datetime.strptime(request.GET.get('to'),"%Y-%m-%d")
-
-#         sales_date_to+=datetime.timedelta(days=1)
-#         # orders=Order.objects.filter(created_at__range=[sales_date_from,sales_date_to])
-
-#         most_moving_product_count=[]
-#         most_moving_product=[]
-#         product_price=[]
-#         products=Product.objects.all()
-#         for i in products:
-#             most_moving_product.append(i)
-#             most_moving_product_count.append(
-#                 OrderItem.objects.filter(
-#                     product=i,status='Delivered'
-#                 ).count()
-#             )
-#             product_price.append(i.price)
-            
-#         total_revenue=[]
-        
-#         total_revenue=[a*b for a,b in zip(most_moving_product_count,product_price)]
-#     return render(request,'adminapp/product_sales_report.html',{
-#         'product-count':most_moving_product_count,
-#         'product-price':product_price,
-#     })
-
-
+@login_required(login_url='adminlogin')
 def by_month(request):
-    month=request.POST.get('month')
+    month=request.GET.get('month')
     orders=Order.objects.filter(created_at__month=month)
     new_order_list=[]
 
@@ -873,8 +917,10 @@ def by_month(request):
         'order':new_order_list,
     })
 
+
+@login_required(login_url='adminlogin')
 def by_year(request):
-    year=request.POST.get('year')
+    year=request.GET.get('year')
     orders=Order.objects.filter(created_at__year=year)
     new_order_list=[]
 
@@ -896,3 +942,50 @@ def by_year(request):
     return render(request,'adminapp/salesReport.html',{
         'order':new_order_list,
     })
+
+
+def sales_doc(request):
+    doc = DocxTemplate("template.docx")
+    doc_io = io.BytesIO() # create a file-like object
+    doc.save(doc_io) # save data to file-like object
+    doc_io.seek(0) # go to the beginning of the file-like object
+
+    response = HttpResponse(doc_io.read())
+
+    # Content-Disposition header makes a file downloadable
+    response["Content-Disposition"] = "attachment; filename=generated_doc.docx"
+
+    # Set the appropriate Content-Type for docx file
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

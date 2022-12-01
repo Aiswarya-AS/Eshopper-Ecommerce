@@ -11,7 +11,7 @@ from category.models import Category,Subcategory,Variations
 from django.http import HttpResponseRedirect
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
-from offers.models import Coupon,ReviewCoupon
+from offers.models import Coupon
 
 # Create your views here.
 
@@ -206,6 +206,7 @@ def delete_cart_item(request,product_id,cart_item_id):
 
 @login_required(login_url='login-page')
 def checkout(request,total=0,quantity=0):
+    coupons=Coupon.objects.all()
     address=Address.objects.filter(user=request.user)
     cart_items=CartItem.objects.filter(user=request.user,is_active=True)
     for cart_item in cart_items:
@@ -223,7 +224,8 @@ def checkout(request,total=0,quantity=0):
         'cart_items':cart_items,
         'total':total,
         'quantity':quantity,
-        'address':address
+        'address':address,
+        'coupons':coupons
     })
 
 
@@ -233,7 +235,7 @@ def decrease_quantity(request):
 
 
     if request.user.is_authenticated:
-            cart_item=CartItem.objects.get(product=product,user=request.user)
+        cart_item=CartItem.objects.get(product=product,user=request.user)
     else:
         cart=Cart.objects.get(cart_id=_cart_id(request))
         cart_item=CartItem.objects.get(product=product,cart=cart)

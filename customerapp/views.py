@@ -9,14 +9,13 @@ from django.contrib import messages
 import random
 from twilio.rest import Client
 from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
-
+from category.models import Size
 from carts.views import _cart_id
 from carts.models import Cart,CartItem
 
 from django.views.decorators.cache import never_cache
 # Create your views here.
-def user_register(request):
-    
+def user_register(request): 
     form=RegistrationForm()
     if request.method=='POST':
         form=RegistrationForm(request.POST)
@@ -25,24 +24,15 @@ def user_register(request):
             print(phone)
             user=form.save()
             return redirect('login-page')
-            # messages.success(request,"Account Created !")
-            # return redirect('home')
     return render(request,'customerapp/register.html',{
         'form':form
     })
 
 
-# def index(request):
-#     if request.user.is_authenticated:
-#         return redirect('home')
-#     else:
-#         return redirect('admin-login')
 
 
 @never_cache
 def home(request):
-    # if request.user.is_authenticated:
-    #     return redirect(home)
     if request.user.is_superuser:
         return redirect('adminlogin')
     category=Category.objects.all()
@@ -68,7 +58,6 @@ def store(request,category_slug=None,subcategory_slug=None):
     categories=None
     if category_slug!=None:
         categories=get_object_or_404(Category,slug=category_slug)
-
         products=Product.objects.filter(category=categories)
         paginator=Paginator(products,2)
         page=request.GET.get('page')
@@ -99,10 +88,6 @@ def product_detail(request,category_slug,subcategory_slug,product_slug):
         single_product=Product.objects.get(category__slug=category_slug,subcategory__slug=subcategory_slug,slug=product_slug) 
         variation=Variations.objects.filter(product=single_product.id)
         in_cart=CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
-        
-        
-        
-        
     except Exception as e:
         raise e
     
@@ -163,6 +148,7 @@ def verify_otp(request):
         ge_otp=obj.Otp
         if re_otp==ge_otp:
             user=CustomUser.objects.get(phone=obj.phone)
+            
             if user.is_superuser==False:
                 login(request,user)
                 return redirect('home')
@@ -283,9 +269,10 @@ def user_wishlist(request):
 
 def my_profile(request):
     return render(request,'customerapp/my_profile.html')
-from category.models import Size
+
+
+
 def load_size_user(request):
-    print("loaded this function................................................................")
     color=request.GET.get('color_id')
 
     size=Size.objects.filter(color=color).all()

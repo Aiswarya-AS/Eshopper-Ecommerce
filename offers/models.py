@@ -30,7 +30,7 @@ class Coupon(models.Model):
     valid_from = models.DateField()
     valid_to = models.DateField()
     discount = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
+        validators=[MinValueValidator(0), MaxValueValidator(70)]
     )
     active = models.BooleanField(default=True)
 
@@ -38,9 +38,3 @@ class Coupon(models.Model):
         return self.code
 
 
-class ReviewCoupon(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.coupon.coupon_name

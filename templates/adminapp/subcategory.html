@@ -193,6 +193,7 @@
                       <a href="{% url 'addsubcategory' %}">  <button type="button" class="btn btn-dark btn-md btn-block float-right">Add SubCategory</button></a>
                     </p>
                     <div class="table-responsive">
+                      {% if  sub_category %}
                       <table class="table">
                         <thead>
                           <tr>
@@ -217,6 +218,9 @@
                           {% endfor %}
                         </tbody>
                       </table>
+                      {% else %}
+                      <h4>No Subcategory Found!!</h4>
+                      {% endif %}
                     </div>
                   </div>
                 </div>

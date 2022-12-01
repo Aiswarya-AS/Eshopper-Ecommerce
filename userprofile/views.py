@@ -29,6 +29,7 @@ def add_address(request):
     return render(request,'customerapp/add_address.html',{
         'form':address_form
     })
+
 def edit_address(request,id):
     address=get_object_or_404(Address, id = id)
     address_form=UserAddressForm(request.POST or None,instance=address)
@@ -39,6 +40,7 @@ def edit_address(request,id):
     {
         'form':address_form
     })
+
 
 def delete_address(request,id):
     address=get_object_or_404(Address, id = id).delete()

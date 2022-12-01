@@ -222,7 +222,24 @@
                                 <h6 class="text-truncate mb-3">{{ p.product_name }}</h6>
                                 <div class="d-flex justify-content-center">
                                     <h6>₹{{ p.price }}</h6><h6 class="text-muted ml-2"><span style="color: green;">{% if p.productoffer.discount %}
-                                        {{ p.productoffer.discount }}% off 
+                                        <!-- p {{.productoffer.discount }}% off {{ p.category.categoryoffer.discount }} -->
+                                        
+                                        
+                                        {% if p.productoffer.discount > p.category.categoryoffer.discount and p.productoffer.discount > p.subcategory.subcategoryoffer.discount %}  
+                                            
+                                                upto {{ p.productoffer.discount }}% off
+                                        {% elif p.category.categoryoffer.discount > p.productoffer.discount and p.category.categoryoffer.discount > p.subcategory.subcategoryoffer.discount   %}
+                                                upto {{ p.category.categoryoffer.discount }}% off
+                                        
+                                        {%else %}
+                                                upto {{ p.subcategory.subcategoryoffer.discount }}% off
+                                        {% endif %}
+
+
+
+
+
+
                                         {% else %}
 
                                         {% endif %}</span></h6>

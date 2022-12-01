@@ -50,22 +50,6 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
 
-    def get_revenue(self,month=timezone.now().month):
-        orderitems=apps.get_model("orders",'OrderItem')
-        orders=orderitems.objects.filter(product=self,created_at__month=month,status="Delivered")
-        return orders.values("product").annotate(revenue=Sum("price"))
-
-    def get_profit(self,month=timezone.now().month):
-        orderitems=apps.get_model("orders",'OrderItem')
-        orders=orderitems.objects.filter(product=self,created_at__month=month,status="Delivered")
-        calculating_profit=orders.values('product').annotate(profit=Sum('price'))
-        profit=calculating_profit[0]['profit']*0.23
-        return profit
-        
-    def get_count(self,month=timezone.now().month):
-        orderitems=apps.get_model("orders",'OrderItem')
-        orders=orderitems.objects.filter(product=self,created_at__month=month,status="Delivered")
-        return orders.values("product").annotate(quantity=Sum("quantity"))
 
     def offer_price(self):
         try:
@@ -98,7 +82,7 @@ class Product(models.Model):
                     return {
                             "new_price":self.price
                         }
-            
+           
 
 
 

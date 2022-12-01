@@ -28,23 +28,18 @@ urlpatterns = [
     path('subcataddproduct/<int:catid>/',views.load_subcategory,name='load-subcategory'),
     path('deleteproduct/<int:id>/',views.delete_product,name='deleteproduct'),
 
-    # Product Varaition
+    # Product Variation
     path('add_size/',views.add_size,name='add_size'),
     path('add_color/',views.add_color,name='add_color'),
     path('variations/',views.variations,name='variations'),
     path('add_variations/<int:id>/',views.add_variations,name='add_variations'),
     path('load_size/',views.load_size,name='load_size'),
 
-
-
-
-
     # Order Managment
     path('orders/',views.orders,name='orders'),
     path('order_items/',views.order_items,name='order_items'),
 
-
-    # Coupon Managment
+    # Offer Managment
     path('category_offer',views.category_offer,name='category_offer'),
     path('add_category_offer',views.add_category_offer,name='add_category_offer'),
     path('edit_category_offer/<int:id>/',views.edit_category_offer,name='edit_category_offer'),
@@ -52,16 +47,18 @@ urlpatterns = [
     
     path('subcategory_offer',views.subcategory_offer,name='subcategory_offer'),
     path('add_subcategory_offer',views.add_subcategory_offer,name='add_subcategory_offer'),
-    path('edit_subcategory_offer',views.edit_subcategory_offer,name='edit_subcategory_offer'),
-    path('delete_subcategory_offer',views.delete_subcategory_offer,name='delete_subcategory_offer'),
+    path('edit_subcategory_offer/<int:id>/',views.edit_subcategory_offer,name='edit_subcategory_offer'),
+    path('delete_subcategory_offer/<int:id>/',views.delete_subcategory_offer,name='delete_subcategory_offer'),
 
     path('product_offer',views.product_offer,name='product_offer'),
     path('add_product_offer',views.add_product_offer,name='add_product_offer'),
-    path('edit_product_offer',views.edit_product_offer,name='edit_product_offer'),
-    path('delete_product_offer',views.delete_product_offer,name='delete_product_offer'),
+    path('edit_product_offer/<int:id>/',views.edit_product_offer,name='edit_product_offer'),
+    path('delete_product_offer/<int:id>/',views.delete_product_offer,name='delete_product_offer'),
 
     path('coupons/',views.coupons,name='coupons'),
     path('add_coupons/',views.add_coupons,name='add_coupons'),
+    path('edit_coupons/<int:id>/',views.edit_coupons,name='edit_coupons'),
+    path('delete_coupons/<int:id>/',views.delete_coupons,name='delete_coupons'),
 
     # Report
     path('product_report/',views.product_report,name='product_report'),
@@ -73,6 +70,7 @@ urlpatterns = [
     path('by_date/',views.by_date,name='by_date'),
     path('generatesalesReportPdf',views.generatesalesReportPdf.as_view(),name='generatesalesReportPdf'),
     path('by_month/',views.by_month,name='by_month'),
-    path('by_year/',views.by_year,name='by_year')
+    path('by_year/',views.by_year,name='by_year'),
+    path('sales_doc/',views.sales_doc,name='sales_doc'),
 
 ]
