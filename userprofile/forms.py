@@ -1,7 +1,8 @@
 from django import forms
 from django import forms
-from django.contrib.auth.forms import (AuthenticationForm,)
 from .models import Address
+from django.contrib.auth.forms import UserCreationForm
+from accounts.models import CustomUser
 
 class UserAddressForm(forms.ModelForm):
     class Meta:
@@ -35,3 +36,10 @@ class UserAddressForm(forms.ModelForm):
             self.fields["email"].widget.attrs.update(
                 {"class":"form-control","placeholder":"Email"}
             )
+
+class EditUserForm(forms.ModelForm):
+    class Meta:
+        model=CustomUser
+        fields=['first_name','last_name','email','phone']
+    
+        

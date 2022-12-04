@@ -944,21 +944,6 @@ def by_year(request):
     })
 
 
-def sales_doc(request):
-    doc = DocxTemplate("template.docx")
-    doc_io = io.BytesIO() # create a file-like object
-    doc.save(doc_io) # save data to file-like object
-    doc_io.seek(0) # go to the beginning of the file-like object
-
-    response = HttpResponse(doc_io.read())
-
-    # Content-Disposition header makes a file downloadable
-    response["Content-Disposition"] = "attachment; filename=generated_doc.docx"
-
-    # Set the appropriate Content-Type for docx file
-    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-
-    return response
 
 
 

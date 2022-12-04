@@ -1,14 +1,13 @@
-function decereseQuantity(qty,id,sub_total){
+function decereseQuantity(qty,id,sub_total,c_id){
     var qty=$('#'+qty)
     var sub_total=$('#'+sub_total)
-    console.log('heehheee')
     
-
     $.ajax({
         type:"GET",
         url:"/cart/decrease_quantity/",
         data:{
-            'id':id
+            'id':id,
+            'c_id':c_id
         },
         success : function(r){
             $(qty).val(r.quantity)
@@ -24,17 +23,16 @@ function decereseQuantity(qty,id,sub_total){
 }
 
 
-function increaseQuantity(qty,id,sub_total){
+function increaseQuantity(qty,id,sub_total,c_id){
     var qty=$('#'+qty)
     var sub_total=$('#'+sub_total)
-    console.log('heehheee ++')
     
-
     $.ajax({
         type:"GET",
         url:"/cart/increase_quantity/",
         data:{
-            'id':id
+            'id':id,
+            'c_id':c_id
         },
         success : function(r){
             $(qty).val(r.quantity)

@@ -228,6 +228,7 @@
                           <div class="form-group">
                             <label for="exampleSelectGender">Select Colour</label>
                               <select class="form-control" name="selectcolor"  id="select1">
+                                <option value="">Color</option>
                                 {% for c in colors %}
                                 <option  value="{{ c.id }}">{{ c.color_value }}</option>
                                 {% endfor %}
@@ -236,8 +237,9 @@
                             
                             <div class="form-group">
                               <label for="exampleSelectGender">Select Size</label>
-                                <select  class="form-control" id="select2" name="selectsize"> 
-                                  <option value=""disabled>sizes</option>
+                              
+                                <select   class="form-control" id="select2" name="selectsize"> 
+                                  
                                 </select>
                               </div>
                       </div>

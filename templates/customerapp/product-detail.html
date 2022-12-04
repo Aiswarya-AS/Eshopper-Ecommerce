@@ -1,4 +1,7 @@
 {% extends 'customerapp/base.html' %}
+{% block title %}
+Product Detail
+        {% endblock %}
 {% load static %}
 {% block content %}
 
@@ -107,6 +110,7 @@
                         <div class="d-flex mb-4">
                             <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
                             <select name="color" id="select1" class="form-control">
+                                <option value="">Select Colour:</option>
                                 {% for v in variation %}
                                 <option value="{{ v.color.id }}">{{ v.color.color_value }}</option>
                                 {% endfor %}

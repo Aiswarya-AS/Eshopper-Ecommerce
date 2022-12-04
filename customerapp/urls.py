@@ -3,11 +3,11 @@ from . import views
 urlpatterns = [
     path('',views.home,name='home'),
     path('register/',views.user_register,name='register'),
-    path('login-otp/',views.login_otp,name='login-otp'),
-    path('login-pass/',views.login_pass,name='login-pass'),
     path('login-page/',views.login_page,name='login-page'),
-    path('verify-otp/',views.verify_otp,name='verify-otp'),
+    path('login-otp/',views.login_otp,name='login-otp'),
     path('otp/',views.otp,name='otp'),
+    path('verify-otp/',views.verify_otp,name='verify-otp'),
+    path('login-pass/',views.login_pass,name='login-pass'),
     path('logout/',views.user_logout,name='logout_user'),
 
     # Store
@@ -30,6 +30,7 @@ urlpatterns = [
     path('my_profile/',views.my_profile,name="my_profile"),
     path('change_password',views.change_password,name='change_password'),
 
+    # filter
     path('filter_price',views.filter_price,name='filter_price'),
 
 

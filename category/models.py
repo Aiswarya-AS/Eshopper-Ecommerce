@@ -82,7 +82,7 @@ class Product(models.Model):
                     return {
                             "new_price":self.price
                         }
-           
+        
 
 
 

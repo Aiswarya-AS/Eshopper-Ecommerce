@@ -1,6 +1,10 @@
 {% extends 'customerapp/base.html' %}
+{% block title %}
+Your Cart
+        {% endblock %}
 {% load static %}
 {% block content %}
+
     <!-- Topbar Start -->
     <div class="container-fluid">
         {% include 'customerapp/includes/topnav.html' %}
@@ -31,7 +35,7 @@
         <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
             <h1 class="font-weight-semi-bold text-uppercase mb-3">Shopping Cart</h1>
             <div class="d-inline-flex">
-                <p class="m-0"><a href="">Home</a></p>
+                <p class="m-0"><a href="{% url 'home' %}">Home</a></p>
                 <p class="m-0 px-2">-</p>
                 <p class="m-0">Shopping Cart</p>
             </div>
@@ -91,7 +95,7 @@
                                                 <i class="fa fa-minus"></i>
                                             </button> -->
                                         
-                                            <button class="btn btn-sm btn-primary btn-minus" onclick= 'decereseQuantity("quantity_value{{ forloop.counter }}","{{ cart_item.product.id }}","sub_total{{ forloop.counter }}")' ><i class="fa fa-minus"></i></button>
+                                            <button class="btn btn-sm btn-primary btn-minus" onclick= 'decereseQuantity("quantity_value{{ forloop.counter }}","{{ cart_item.product.id }}","sub_total{{ forloop.counter }}","{{ cart_item.id}}")' ><i class="fa fa-minus"></i></button>
                                             
                                         </div>
 
@@ -104,13 +108,13 @@
                                             {% comment %} <a href="{% url 'add_to_cart' cart_item.product.id %}"><button class="btn btn-sm btn-primary btn-plus">
                                                     <i class="fa fa-plus"></i>
                                                 </button></a>  {% endcomment %}
-                                                <button class="btn btn-sm btn-primary btn-minus" onclick= 'increaseQuantity("quantity_value{{ forloop.counter }}","{{ cart_item.product.id }}","sub_total{{ forloop.counter }}")' ><i class="fa fa-plus"></i></button>
+                                                <button class="btn btn-sm btn-primary btn-minus" onclick= 'increaseQuantity("quantity_value{{ forloop.counter }}","{{ cart_item.product.id }}","sub_total{{ forloop.counter }}","{{ cart_item.id}}")' ><i class="fa fa-plus"></i></button>
 
                                             </div>
                                         </div>
                             <!-- </form> -->
                             </td>
-                            <td id="sub_total{{ forloop.counter }}" class="align-middle">₹{{ cart_item.sub_total }}</td>
+                            <td id="sub_total{{ forloop.counter }}" class="align-middle">₹{{ cart_item.sub_total }} </td>
                             <td class="align-middle"><a href="#myModal" class="trigger-btn" data-toggle="modal"> <button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></a></td>
                         </tr>
                         <div id="myModal" class="modal fade">
@@ -126,7 +130,7 @@
                                     </div>
                                     <div class="modal-footer justify-content-center">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                        <a href="{% url 'delete_cart_item' cart_item.product.id cart_item.id %}"> <button class="btn btn-sm btn-primary">Yes</button></a>
+                                        <a href="{% url 'delete_cart_item' cart_item.id cart_item.product.id  %}"> <button class="btn btn-sm btn-primary">Yes</button></a>
                                     </div>
                                 </div>
                             </div>

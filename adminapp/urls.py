@@ -71,6 +71,6 @@ urlpatterns = [
     path('generatesalesReportPdf',views.generatesalesReportPdf.as_view(),name='generatesalesReportPdf'),
     path('by_month/',views.by_month,name='by_month'),
     path('by_year/',views.by_year,name='by_year'),
-    path('sales_doc/',views.sales_doc,name='sales_doc'),
+    
 
 ]

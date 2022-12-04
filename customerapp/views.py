@@ -8,27 +8,15 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 import random
 from twilio.rest import Client
-from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
+from django.core.paginator import Paginator
 from category.models import Size
 from carts.views import _cart_id
 from carts.models import Cart,CartItem
-
 from django.views.decorators.cache import never_cache
+from category.models import Variations
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 # Create your views here.
-def user_register(request): 
-    form=RegistrationForm()
-    if request.method=='POST':
-        form=RegistrationForm(request.POST)
-        if form.is_valid():
-            phone=request.POST.get('phone')
-            print(phone)
-            user=form.save()
-            return redirect('login-page')
-    return render(request,'customerapp/register.html',{
-        'form':form
-    })
-
-
 
 
 @never_cache
@@ -47,74 +35,49 @@ def home(request):
 
 
 
-def user_logout(request):
-    logout(request)
-    return redirect('home')
-
-def store(request,category_slug=None,subcategory_slug=None):
-    category=Category.objects.all()
-    subcategories=None
-    products=None
-    categories=None
-    if category_slug!=None:
-        categories=get_object_or_404(Category,slug=category_slug)
-        products=Product.objects.filter(category=categories)
-        paginator=Paginator(products,2)
-        page=request.GET.get('page')
-        paged_products=paginator.get_page(page)
-        
-    elif category_slug and subcategory_slug!=None:
-        subcategories=get_object_or_404(Subcategory,slug=subcategory_slug)
-        products=Product.objects.filter(subcategory=subcategories,category=category_slug)
-        paginator=Paginator(products,2)
-        page=request.GET.get('page')
-        paged_products=paginator.get_page(page)
-    else:
-
-        products=Product.objects.all()
-        paginator=Paginator(products,2)
-        page=request.GET.get('page')
-        paged_products=paginator.get_page(page)
-    return render(request,'customerapp/store.html',{
-        'category':category,
-        'products':paged_products
-    })
-
-from category.models import Variations
-def product_detail(request,category_slug,subcategory_slug,product_slug):
-    category=Category.objects.all()
-    
-    try:
-        single_product=Product.objects.get(category__slug=category_slug,subcategory__slug=subcategory_slug,slug=product_slug) 
-        variation=Variations.objects.filter(product=single_product.id)
-        in_cart=CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
-    except Exception as e:
-        raise e
-    
-
-    return render(request,'customerapp/product-detail.html',{
-        'single_product':single_product,
-        'category':category,
-        'in_cart':in_cart,
-        'variation':variation
-        
+def user_register(request): 
+    form=RegistrationForm()
+    if request.method=='POST':
+        form=RegistrationForm(request.POST)
+        if form.is_valid():
+            phone=request.POST.get('phone')
+            print(phone)
+            user=form.save()
+            return redirect('login-page')
+    return render(request,'customerapp/register.html',{
+        'form':form
     })
 
 
-def search(request):
-    if 'keyword' in request.GET:
-        keyword=request.GET['keyword']
-        if keyword:
-            
-            products=Product.objects.order_by('-added_date').filter(product_name__icontains=keyword)
-
-    context={
-        'products':products
-    }
-    
-    return render(request,'customerapp/store.html',context)
+def login_page(request):
+    if request.user.is_superuser:
+        return redirect('adminlogin')
+    if request.user.is_authenticated:
+        return redirect('home')
+    return render(request,'customerapp/login-otp.html')
 
 
+class OtpGenerate():
+    Otp=None
+    phone=None
+
+    def send_otp(phone):
+        account_sid='AC9315825af374025a0a2827c4d28ddf85'
+        auth_token='01d2740881c46c03f2c129903e0d0682'
+        target_number = '+91' + phone
+        twilio_number='+12134680849'
+        otp=random.randint(1000,9999)
+        OtpGenerate.Otp=str(otp)
+        OtpGenerate.phone=phone
+        msg="your otp is " + str(otp)
+        client=Client(account_sid,auth_token)
+        message=client.messages.create(
+        body=msg,
+        from_=twilio_number,
+        to=target_number
+        )
+        print(message.body)
+        return True
 
 
 
@@ -126,13 +89,6 @@ def login_otp(request):
         print(phone)
         OtpGenerate.send_otp(phone)
         return redirect('otp')
-    
-def login_page(request):
-    if request.user.is_superuser:
-        return redirect('adminlogin')
-    if request.user.is_authenticated:
-        return redirect('home')
-    return render(request,'customerapp/login-otp.html')
 
 
 def otp(request):
@@ -158,33 +114,6 @@ def verify_otp(request):
     else:
         messages.error(request,"Invalid Credentials")
         return redirect('otp')
-    
-
-
-
-    
-class OtpGenerate():
-    Otp=None
-    phone=None
-
-    def send_otp(phone):
-        account_sid='AC9315825af374025a0a2827c4d28ddf85'
-        auth_token='01d2740881c46c03f2c129903e0d0682'
-        target_number = '+91' + phone
-        twilio_number='+12134680849'
-        otp=random.randint(1000,9999)
-        OtpGenerate.Otp=str(otp)
-        OtpGenerate.phone=phone
-        msg="your otp is " + str(otp)
-        client=Client(account_sid,auth_token)
-        message=client.messages.create(
-        body=msg,
-        from_=twilio_number,
-        to=target_number
-        )
-        print(message.body)
-        return True
-
 
 
 @never_cache
@@ -248,6 +177,83 @@ def login_pass(request):
 
 
 
+def user_logout(request):
+    logout(request)
+    return redirect('home')
+
+
+# Store
+
+def store(request,category_slug=None,subcategory_slug=None):
+    category=Category.objects.all()
+    subcategories=None
+    products=None
+    categories=None
+    if category_slug!=None:
+        categories=get_object_or_404(Category,slug=category_slug)
+        products=Product.objects.filter(category=categories)
+        paginator=Paginator(products,2)
+        page=request.GET.get('page')
+        paged_products=paginator.get_page(page)
+
+    elif category_slug and subcategory_slug!=None:
+        subcategories=get_object_or_404(Subcategory,slug=subcategory_slug)
+        products=Product.objects.filter(subcategory=subcategories,category=category_slug)
+        paginator=Paginator(products,2)
+        page=request.GET.get('page')
+        paged_products=paginator.get_page(page)
+    else:
+
+        products=Product.objects.all()
+        paginator=Paginator(products,2)
+        page=request.GET.get('page')
+        paged_products=paginator.get_page(page)
+    return render(request,'customerapp/store.html',{
+        'category':category,
+        'products':paged_products
+    })
+
+
+
+
+
+def product_detail(request,category_slug,subcategory_slug,product_slug):
+    category=Category.objects.all()
+    
+    try:
+        single_product=Product.objects.get(category__slug=category_slug,subcategory__slug=subcategory_slug,slug=product_slug) 
+        variation=Variations.objects.filter(product=single_product.id)
+        result = (Variations.objects.filter(product=single_product.id).values('color'))
+        print(result,'////////////////////////////////////////')
+        in_cart=CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
+    except Exception as e:
+        raise e
+    
+
+    return render(request,'customerapp/product-detail.html',{
+        'single_product':single_product,
+        'category':category,
+        'in_cart':in_cart,
+        'variation':variation
+        
+    })
+
+
+def search(request):
+    if 'keyword' in request.GET:
+        keyword=request.GET['keyword']
+        if keyword:
+            
+            products=Product.objects.order_by('-added_date').filter(product_name__icontains=keyword)
+
+    context={
+        'products':products
+    }
+    
+    return render(request,'customerapp/store.html',context)
+
+
+# Wishlist
 def add_to_wishlist(request,id):
     product=get_object_or_404(Product,id=id)
     if product.users_wishlist.filter(id=request.user.id).exists():
@@ -258,7 +264,7 @@ def add_to_wishlist(request,id):
         messages.success(request,"Added "+product.product_name+" to your wishlist")
     return HttpResponseRedirect(request.META["HTTP_REFERER"])
 
-
+@login_required(login_url='login-page')
 def user_wishlist(request):
     products=Product.objects.filter(users_wishlist=request.user)
     return render(request,'customerapp/wishlist.html',{
@@ -267,10 +273,7 @@ def user_wishlist(request):
 
 
 
-def my_profile(request):
-    return render(request,'customerapp/my_profile.html')
-
-
+# Variation
 
 def load_size_user(request):
     color=request.GET.get('color_id')
@@ -279,6 +282,14 @@ def load_size_user(request):
     return render(request,'customerapp/user-size-dropdown.html',{
         'size':size
     })
+
+
+# User Profile
+@login_required(login_url='login-page')
+def my_profile(request):
+    return render(request,'customerapp/my_profile.html')
+
+
 
 def change_password(request):
     if request.method=='POST':
@@ -302,8 +313,11 @@ def change_password(request):
             return redirect("my_profile")
     return redirect('my_profile')
 
-from django.db.models import Q
+
+
+
 def filter_price(request):
+    category=Category.objects.all()
     selected=request.GET.get('gridRadios')
     if int(selected) == 1:
         products=Product.objects.filter(Q(price__lte = 100 ))
@@ -320,5 +334,6 @@ def filter_price(request):
 
 
     return render(request,'customerapp/filter_store.html',{
-        'products':products
+        'products':products,
+        'category':category
     })
