@@ -23,7 +23,7 @@ from offers.models import CategoryOffer,SubcategoryOffer,ProductOffer,Coupon
 from category.models import Color,Size,Variations
 from django.core.paginator import Paginator
 import io
-from docxtpl import DocxTemplate
+
 # Create your views here.
 
 

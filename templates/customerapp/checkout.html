@@ -34,22 +34,7 @@
    
   </head>
   <body>
-    <!-- <div class="row">
-      <div class="col-lg-4">
-        <form class="mb-5" id="coupon_form">
-            {% csrf_token %}
-            {% for i in messages %}
-            <p class="pl-3"style="color:red;">{{i}}</p>
-            {% endfor %}
-            <div class="input-group">
-                <input type="text" name="code" id="code" class="form-control p-4" placeholder="Coupon Code">
-                <div class="input-group-append">
-                    <a onclick="apply_coupon()" class="btn btn-primary">Apply Coupon</a>
-                </div>
-            </div>
-        </form>
-        </div>
-    </div> -->
+    
     <div class="container">
         <div class="py-5 text-center">
           
@@ -158,10 +143,8 @@
                       
                       <p>
                         <button type="button" class="btn btn-primary mt-5" id="bt" onclick="toggle(this)">Get Coupon Code</button>
-                        <!-- <button type="button" class="btn btn-outline-danger mt-5 " onClick="window.location.reload();">Remove Coupon</button> -->
                 </p>
             
-                <!--The DIV element to toggle visibility. Its "display" property is set as "none". -->
                 <div style=" padding:10px; display:none;" id="cont">
                   <div class="row">
                     {% if coupons %}
@@ -183,7 +166,6 @@
             
           </div>
           
-          <!-- <a href="{% url 'add_address' %}"><h6>Add New Address</h6></a> -->
           {% endif %}
           <a href="{% url 'add_address' %}" class="btn btn-primary mt-5  float-right" style="margin-left:21.5rem;" type="submit">Add New Address  </a>
         </form>

@@ -16,6 +16,7 @@ from django.views.decorators.cache import never_cache
 from category.models import Variations
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from decouple import config
 # Create your views here.
 
 
@@ -62,10 +63,10 @@ class OtpGenerate():
     phone=None
 
     def send_otp(phone):
-        account_sid='AC9315825af374025a0a2827c4d28ddf85'
-        auth_token='01d2740881c46c03f2c129903e0d0682'
+        account_sid=config('account_sid')
+        auth_token=config('auth_token')
         target_number = '+91' + phone
-        twilio_number='+12134680849'
+        twilio_number=config('twilio_number')
         otp=random.randint(1000,9999)
         OtpGenerate.Otp=str(otp)
         OtpGenerate.phone=phone
@@ -86,7 +87,6 @@ def login_otp(request):
         return redirect('home')
     if request.method =='GET':
         phone=request.GET.get('phone')
-        print(phone)
         OtpGenerate.send_otp(phone)
         return redirect('otp')
 
@@ -104,7 +104,42 @@ def verify_otp(request):
         ge_otp=obj.Otp
         if re_otp==ge_otp:
             user=CustomUser.objects.get(phone=obj.phone)
-            
+            if user.blocked==False:
+                try:
+                    cart=Cart.objects.get(cart_id=_cart_id(request))
+                    is_cart_item_exists=CartItem.objects.filter(cart=cart).exists()
+                    
+                    if is_cart_item_exists:
+                        cart_item=CartItem.objects.filter(cart=cart)
+                        product_variation = []
+                        for item in cart_item:
+                            variation=item.variations.all()
+                            product_variation.append(list(variation))
+                        cart_item = CartItem.objects.filter(user=user)
+                        ex_var_list = []
+                        id = []
+                        for item in cart_item:
+                            existing_variations = item.variations.all()
+                            ex_var_list.append(list(existing_variations))
+                            id.append(item.id)
+
+
+                        for pr in product_variation:
+                            if pr in ex_var_list:
+                                index = ex_var_list.index(pr)
+                                item_id = id[index]
+                                item = CartItem.objects.get(id=item_id)
+                                item.quantity = item.quantity + 1
+                                item.user = user
+                                item.save()
+                            else:
+                                cart_item = CartItem.objects.filter(cart=cart)
+                                for item in cart_item:
+                                    item.user = user
+                                    item.save()
+                except:
+                    pass
+
             if user.is_superuser==False:
                 login(request,user)
                 return redirect('home')
@@ -266,9 +301,11 @@ def add_to_wishlist(request,id):
 
 @login_required(login_url='login-page')
 def user_wishlist(request):
+    
     products=Product.objects.filter(users_wishlist=request.user)
     return render(request,'customerapp/wishlist.html',{
-        'wishlist':products
+        'wishlist':products,
+        
     })
 
 

@@ -263,6 +263,7 @@ def apply_coupon(request):
         if cart_item.product.offer_price():
             offer_price=Product.offer_price(cart_item.product)
             total+=(offer_price["new_price"]*cart_item.quantity)
+            total=round(total,2)
         else:
             total+=(cart_item.product.price*cart_item.quantity)
     
