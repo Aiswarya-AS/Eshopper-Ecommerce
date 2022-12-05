@@ -63,10 +63,10 @@ class OtpGenerate():
     phone=None
 
     def send_otp(phone):
-        account_sid=config('account_sid')
-        auth_token=config('auth_token')
+        account_sid='AC9315825af374025a0a2827c4d28ddf85'
+        auth_token='16ce41bdd4ae272bc30b5dee7347f9fa'
         target_number = '+91' + phone
-        twilio_number=config('twilio_number')
+        twilio_number='+12134680849'
         otp=random.randint(1000,9999)
         OtpGenerate.Otp=str(otp)
         OtpGenerate.phone=phone
@@ -259,7 +259,6 @@ def product_detail(request,category_slug,subcategory_slug,product_slug):
         single_product=Product.objects.get(category__slug=category_slug,subcategory__slug=subcategory_slug,slug=product_slug) 
         variation=Variations.objects.filter(product=single_product.id)
         result = (Variations.objects.filter(product=single_product.id).values('color'))
-        print(result,'////////////////////////////////////////')
         in_cart=CartItem.objects.filter(cart__cart_id=_cart_id(request),product=single_product).exists()
     except Exception as e:
         raise e
