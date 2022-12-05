@@ -85,10 +85,13 @@ class OtpGenerate():
 def login_otp(request):
     if request.user.is_authenticated:
         return redirect('home')
-    if request.method =='GET':
+    if request.method =='GET' and request.GET.get('phone'):
         phone=request.GET.get('phone')
         OtpGenerate.send_otp(phone)
         return redirect('otp')
+    else:
+        messages.error(request,'Please provide your phone number')
+        return redirect('login-page')
 
 
 def otp(request):

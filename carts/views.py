@@ -190,12 +190,19 @@ def decrease_quantity(request):
         cart=Cart.objects.get(cart_id=_cart_id(request))
         cart_item=CartItem.objects.get(id=id_cart,product=product,cart=cart)
 
-    if cart_item.quantity > 1: 
-        qty=cart_item.quantity - 1
-        cart_item.quantity-=1
-        if cart_item.quantity==0:
+    if cart_item.quantity: 
+        
+            
+        qty = cart_item.quantity - 1
+        cart_item.quantity -= 1
+        if cart_item.quantity < 1:
+            status=False
             cart_item.quantity=1
-        cart_item.save()
+            cart_item.save()
+        else:
+            status=True
+            cart_item.save()
+        
         total_price=(cart_item.product.price*cart_item.quantity)
         total=0
         if cart_item.product.offer_price():
@@ -209,12 +216,16 @@ def decrease_quantity(request):
         sub_total=cart_item.sub_total()
         you_saved=total_price-total
         saved=round(you_saved,2)
+    
     return JsonResponse({
         'quantity':qty,
         'total':total,
         'sub_total':sub_total,
         'total_price':total_price,
         'saved':saved,
+        'status':status
+        
+        
 
     })
 

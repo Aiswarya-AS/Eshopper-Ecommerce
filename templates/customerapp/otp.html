@@ -24,6 +24,9 @@
         <h3>Enter OTP</h3>
     <input type="text" class="form-control" name='otp' placeholder="Otp">
     <button type="submit">Login</button>
+    {% for o in messages %}
+    <p  style="color: red;">{{o}}</p>
+    {% endfor %}
 </form>
 </div>
         

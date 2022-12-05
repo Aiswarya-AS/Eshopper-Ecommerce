@@ -10,11 +10,17 @@ function decereseQuantity(qty,id,sub_total,c_id){
             'c_id':c_id
         },
         success : function(r){
+            if(r.status==true){
+
+            
             $(qty).val(r.quantity)
             $(sub_total).text("₹"+r.sub_total)
             $('#total').text("₹"+r.total)
             $('#total_price').text("₹"+r.total_price)
             $('#saved').text("-"+r.saved)
+        }else{
+            console.log('not possible')
+        }
         },
         error:function(r){
             alert('Error Occured')
