@@ -25,6 +25,9 @@ from django.core.paginator import Paginator
 import io
 
 # Create your views here.
+from docx import Document
+from django.http import HttpResponse
+
 
 
 def admin_login(request):
@@ -944,6 +947,33 @@ def by_year(request):
     })
 
 
+
+def download_docx(request):
+    document = Document()
+    document.add_heading('Sales Report', 0)
+    records = (
+    (3, '101', 'Spam'),
+    (7, '422', 'Eggs'),
+    (4, '631', 'Spam')
+    )
+    table = document.add_table(rows=1, cols=3)
+    hdr_cells = table.rows[0].cells
+    hdr_cells[0].text = 'Qty'
+    hdr_cells[1].text = 'Id'
+    hdr_cells[2].text = 'Desc'
+    for qty, id, desc in records:
+        row_cells = table.add_row().cells
+        row_cells[0].text = str(qty)
+        row_cells[1].text = id
+        row_cells[2].text = desc
+
+    document.add_page_break()
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = 'attachment; filename=salesReport.docx'
+    document.save(response)
+
+    return response
 
 
 

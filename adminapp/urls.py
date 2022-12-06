@@ -1,7 +1,6 @@
 from django.urls import path,include
 from . import views
 urlpatterns = [
-
     path('',views.admin_login,name='adminlogin'),
     path('dashboard/',views.admin_home,name='admin-home'),
     path('logout',views.admin_logout,name='logout'),
@@ -71,6 +70,7 @@ urlpatterns = [
     path('generatesalesReportPdf',views.generatesalesReportPdf.as_view(),name='generatesalesReportPdf'),
     path('by_month/',views.by_month,name='by_month'),
     path('by_year/',views.by_year,name='by_year'),
+    path('download_docx',views.download_docx,name='download_docx'),
     
 
 ]

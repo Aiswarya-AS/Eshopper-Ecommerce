@@ -167,7 +167,10 @@
           </div>
           
           {% endif %}
+          {% if address %}
           <a href="{% url 'add_address' %}" class="btn btn-primary mt-5  float-right" style="margin-left:21.5rem;" type="submit">Add New Address  </a>
+          {% else %}
+          {% endif %}
         </form>
         <div>
           

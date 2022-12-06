@@ -63,10 +63,10 @@ class OtpGenerate():
     phone=None
 
     def send_otp(phone):
-        account_sid='AC9315825af374025a0a2827c4d28ddf85'
-        auth_token='16ce41bdd4ae272bc30b5dee7347f9fa'
+        account_sid=config('account_sid')
+        auth_token=config('auth_token')
         target_number = '+91' + phone
-        twilio_number='+12134680849'
+        twilio_number=config('twilio_number')
         otp=random.randint(1000,9999)
         OtpGenerate.Otp=str(otp)
         OtpGenerate.phone=phone
