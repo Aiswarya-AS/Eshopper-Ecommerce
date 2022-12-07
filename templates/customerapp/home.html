@@ -190,8 +190,10 @@ Home
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-between bg-light border">
-                    
+                    {% if request.user.is_authenticated %}
                     <a href="{% url 'add_to_wishlist' t.id %}"> <i class="fas fa-heart text-primary "></i></a>
+                    {% else %}
+                    {% endif %}
                     <a href="{{ p.get_url }}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
                 </div>
             </div>
