@@ -19,7 +19,7 @@ class CartItem(models.Model):
     is_active=models.BooleanField(default=True)
     coupon_discount=models.IntegerField(null=True)
     offer_discount=models.IntegerField(null=True)
-
+    
 
     def sub_total(self):
         return self.product.price*self.quantity

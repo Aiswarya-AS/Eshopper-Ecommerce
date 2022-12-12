@@ -12,6 +12,19 @@
     
     <!-- STYLE CSS -->
     <link rel="stylesheet" href="{% static 'css/signup.css'%}">
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        
+        /* Firefox */
+        input[type=number] {
+          -moz-appearance: textfield;
+        }
+        </style>
 </head>
 
 <body>
@@ -22,7 +35,7 @@
     <form action="{% url 'verify-otp' %}" method="POST">
         {% csrf_token %}
         <h3>Enter OTP</h3>
-    <input type="text" class="form-control" name='otp' placeholder="Otp">
+    <input type="number" class="form-control" name='otp' placeholder="Otp">
     <button type="submit">Login</button>
     {% for o in messages %}
     <p  style="color: red;">{{o}}</p>

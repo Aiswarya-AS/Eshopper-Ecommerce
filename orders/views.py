@@ -13,10 +13,12 @@ from django.http import HttpResponse
 from xhtml2pdf import pisa
 from django.views.generic import View
 from django.template.loader import get_template
+from category.models import Category
 # Create your views here.
 
 @login_required(login_url='login-page')
 def order_summary(request):
+    categories=Category.objects.all()
     orders=Order.objects.filter(user=request.user).order_by('created_at')[::-1]
     paginator=Paginator(orders,8)
     page=request.GET.get('page')
@@ -24,17 +26,20 @@ def order_summary(request):
     return render(request,'customerapp/ordersummary.html',{
         
         'orders':paged_orders,
+        'category':categories
     })
 
 
 
 @login_required(login_url='login-page')   
 def orderview(request,id):
+    categories=Category.objects.all()
     orders=Order.objects.filter(id=id).filter(user=request.user).first()
     order_items=OrderItem.objects.filter(order=orders)
     context={
         'orders':orders,
-        'order_items':order_items
+        'order_items':order_items,
+        'category':categories
     }
     return render(request,'customerapp/orderview.html',context)
 

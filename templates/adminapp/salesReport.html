@@ -188,10 +188,11 @@
             <div class="m-2">
               {% if order %}
                 <div class="btn-wrapper">
-                    <a href="{% url 'generatesalesReportPdf' %}" class="btn btn-otline-dark"><i class="icon-printer"></i> Download as PDF</a>
-                    <a href="{% url 'download_docx' %}" class="btn btn-info"><i class="icon-printer"></i> Export as Doc</a>
+                    <a target="_blank" href="{% url 'generatesalesReportPdf' %}" class="btn btn-otline-dark"><i class="icon-printer"></i> Download as PDF</a>
+                    <button onclick="exportHTML()" class="btn btn-info"><i class="icon-printer"></i> Export as Doc</button>
                     <!-- <a href="" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export as Doc</a> -->
                     <button id="downlaodsalesReportexcel" class="btn mx-3 btn-success text-white me-0"><i class="icon-download"></i> Export as Excel</button>
+                    
                 </div>
                 {% else %}
                 
@@ -218,7 +219,7 @@
                   {% csrf_token %}
                   <div class="row mt-3">
                     <div class="col-md-4 mt-1">
-                      <select name="month" class="form-control" id="">
+                      <select name="month" class="form-control" id="monthDP">
                         <option value="01">January</option>
                         <option value="02">February</option>
                         <option value="03">March</option>
@@ -246,7 +247,7 @@
                                   {% csrf_token %}
                                   <div class="row mt-3">
                                     <div class="col-md-4 mt-1">
-                                      <select name="year" class="form-control" id="">
+                                      <select name="year" class="form-control" id="yearDP">
                                         <option value="2020">2020</option>
                                         <option value="2021">2021</option>
                                         <option value="2022">2022</option>
@@ -305,27 +306,7 @@
                         <h3 class="text-center mt-3">No Data</h3>
                     {% endif %}
                   </div>
-                    <!-- pagination -->
-                <!-- <div class="ml-2 mt-2 ms-auto">
-                  <ul class="pagination pg-blue ">
-                    <li class="page-item">
-                      <a class="page-link" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                        <span class="sr-only"></span>
-                      </a>
-                    </li>
-                    <li class="page-item"><a class="page-link">1</a></li>
-                    <li class="page-item"><a class="page-link">2</a></li>
-                    <li class="page-item"><a class="page-link">3</a></li>
-                    <li class="page-item">
-                      <a class="page-link" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                        <span class="sr-only"></span>
-                      </a>
-                    </li>
-                  </ul>
-                </div> -->
-
+                
 
 
                 
@@ -423,5 +404,36 @@
         var table2excel = new Table2Excel();
         table2excel.export(document.querySelectorAll("#sales-table"));
     })
+
+
+  
+      const year = new Date().getFullYear()
+      let selectBox = document.getElementById('yearDP')
+      selectBox.value = year
+
+      const month=new Date().getMonth()
+      let selectMonth=document.getElementById('monthDP')
+      selectMonth.value=month
+
+
+      
+        function exportHTML(){
+           var header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                "xmlns='http://www.w3.org/TR/REC-html40'>"+
+                "<head><meta charset='utf-8'><title>Export HTML to Word Document with JavaScript</title></head><body>";
+           var footer = "</body></html>";
+           var sourceHTML = header+document.getElementById("sales-table").innerHTML+footer;
+           
+           var source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+           var fileDownload = document.createElement("a");
+           document.body.appendChild(fileDownload);
+           fileDownload.href = source;
+           fileDownload.download = 'document.doc';
+           fileDownload.click();
+           document.body.removeChild(fileDownload);
+        }
+    
+
   </script>
  {% endblock %}

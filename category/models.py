@@ -44,6 +44,7 @@ class Product(models.Model):
     users_wishlist=models.ManyToManyField(settings.AUTH_USER_MODEL,related_name='users_wishlist',blank=True)
     
     
+    
     def get_url(self):
         return reverse('product_detail',args=[self.category.slug,self.subcategory.slug,self.slug])
         

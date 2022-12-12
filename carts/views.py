@@ -34,10 +34,10 @@ def cart(request,total=0,quantity=0,cart_items=None):
             cart_items=CartItem.objects.filter(cart=cart,is_active=True)
         
         for cart_item in cart_items:
-            total_price=(cart_item.product.price*cart_item.quantity)
+            total_price+=(cart_item.product.price*cart_item.quantity)
             if cart_item.product.offer_price():
                 offer_price=Product.offer_price(cart_item.product)
-                total+=(offer_price["new_price"]*cart_item.quantity)
+                total+=(offer_price["new_price"]*cart_item.quantity)    
                 total=round(total,2)
             else:
                 total+=(cart_item.product.price*cart_item.quantity)
@@ -113,7 +113,7 @@ def add_cart(request,product_id):
                 
                 cart_item.variations.add(*product_variation)
             cart_item.save()
-        
+        messages.success(request,'Added to Cart')
         
         return HttpResponseRedirect(request.META["HTTP_REFERER"])
     else:
@@ -165,10 +165,10 @@ def add_cart(request,product_id):
 
 
 
-def delete_cart_item(request,cart_item_id,product_id):
+def delete_cart_item(request,product_id,cart_item_id):
     product=get_object_or_404(Product,id=product_id)
     if request.user.is_authenticated:
-        cart_item=CartItem.objects.get(id=cart_item_id,product=product,user=request.user)
+        cart_item=CartItem.objects.get(product=product,user=request.user,id=cart_item_id)
     else:
         cart=Cart.objects.get(cart_id=_cart_id(request))
         cart_item=CartItem.objects.get(product=product,cart=cart,id=cart_item_id)
@@ -192,7 +192,7 @@ def decrease_quantity(request):
 
     if cart_item.quantity: 
         
-            
+        total_price=0
         qty = cart_item.quantity - 1
         cart_item.quantity -= 1
         if cart_item.quantity < 1:
@@ -203,7 +203,7 @@ def decrease_quantity(request):
             status=True
             cart_item.save()
         
-        total_price=(cart_item.product.price*cart_item.quantity)
+        total_price+=(cart_item.product.price*cart_item.quantity)
         total=0
         if cart_item.product.offer_price():
             offer_price=Product.offer_price(cart_item.product)
@@ -216,13 +216,34 @@ def decrease_quantity(request):
         sub_total=cart_item.sub_total()
         you_saved=total_price-total
         saved=round(you_saved,2)
+
+
+
+        if request.user.is_authenticated:
+            cart_items=CartItem.objects.filter(user=request.user,is_active=True)
+        else:
+            cart=Cart.objects.get(cart_id=_cart_id(request))
+            cart_items=CartItem.objects.filter(cart=cart,is_active=True)
+        total_p=0
+        total_price_p=0
+        for cart_item in cart_items:
+            total_price_p+=(cart_item.product.price*cart_item.quantity)
+            if cart_item.product.offer_price():
+                offer_price=Product.offer_price(cart_item.product)
+                total_p+=(offer_price["new_price"]*cart_item.quantity)    
+                total_p=round(total_p,2)
+            else:
+                total_p+=(cart_item.product.price*cart_item.quantity)
+            
+            saved_p=total_price_p-total_p
+            saved_p=round(saved_p,2)
     
     return JsonResponse({
         'quantity':qty,
-        'total':total,
+        'total':total_p,
         'sub_total':sub_total,
-        'total_price':total_price,
-        'saved':saved,
+        'total_price':total_price_p,
+        'saved':saved_p,
         'status':status
         
         
@@ -233,17 +254,19 @@ def decrease_quantity(request):
 def increase_quantity(request):
     product_id=request.GET.get('id')
     id_cart=request.GET.get('c_id')
+    total_price=0
     product=get_object_or_404(Product,id=product_id)
     if request.user.is_authenticated:
         cart_item=CartItem.objects.get(id=id_cart,product=product,user=request.user)
     else:
         cart=Cart.objects.get(cart_id=_cart_id(request))
         cart_item=CartItem.objects.get(id=id_cart,product=product,cart=cart)
+    
     if cart_item.quantity:
+        total_price+=(cart_item.product.price*cart_item.quantity)
         qty = cart_item.quantity + 1
         cart_item.quantity += 1
         cart_item.save()
-        total_price=(cart_item.product.price*cart_item.quantity)
         total=0
         if cart_item.product.offer_price():
             offer_price=Product.offer_price(cart_item.product)
@@ -256,12 +279,34 @@ def increase_quantity(request):
         sub_total=cart_item.sub_total()
         you_saved=total_price-total
         saved=round(you_saved,2)
+        
+
+        
+        if request.user.is_authenticated:
+            cart_items=CartItem.objects.filter(user=request.user,is_active=True)
+        else:
+            cart=Cart.objects.get(cart_id=_cart_id(request))
+            cart_items=CartItem.objects.filter(cart=cart,is_active=True)
+        total_p=0
+        total_price_p=0
+        for cart_item in cart_items:
+            total_price_p+=(cart_item.product.price*cart_item.quantity)
+            if cart_item.product.offer_price():
+                offer_price=Product.offer_price(cart_item.product)
+                total_p+=(offer_price["new_price"]*cart_item.quantity)    
+                total_p=round(total_p,2)
+            else:
+                total_p+=(cart_item.product.price*cart_item.quantity)
+            
+            saved_p=total_price_p-total_p
+            saved_p=round(saved_p,2)
+                
     return JsonResponse({
         'quantity':qty,
-        'total':total,
+        'total':total_p,
         'sub_total':sub_total,
-        'total_price':total_price,
-        'saved':saved,
+        'total_price':total_price_p,
+        'saved':saved_p,
 
     })
 

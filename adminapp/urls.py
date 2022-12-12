@@ -35,7 +35,7 @@ urlpatterns = [
     path('load_size/',views.load_size,name='load_size'),
 
     # Order Managment
-    path('orders/',views.orders,name='orders'),
+    
     path('order_items/',views.order_items,name='order_items'),
 
     # Offer Managment

@@ -58,8 +58,14 @@
                           </div>
                           <div class="d-none d-md-block">
                             <p class="statistics-title">Total Revenue</p>
-                            <h3 class="rate-percentage">{{total_revenue.price__sum|floatformat:2}}</h3>
-                            <!-- <p class="text-success d-flex"><i class="mdi mdi-menu-down"></i><span>+0.8%</span></p> -->
+                            <h3 class="rate-percentage">
+                              {% if total_revenue.price__sum %}
+                                {{total_revenue.price__sum|floatformat:2}}
+                              {% else %}
+                                0
+                              {% endif %}
+
+                            </h3>
                           </div>
                           
                         </div>

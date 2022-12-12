@@ -20,14 +20,14 @@ $(document).ready(function(){
                     // console.log(response);
                     var options = {
                         "key": "rzp_test_Nq0pUqfDOMPhrY", // Enter the Key ID generated from the Dashboard
-                        "amount": response.total_price*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                        "amount": 1*100,//response.total_price*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                         "currency": "INR",
                         "name": "EShopper",
                         "description": "Thank You For Your Purchase",
                     
                         // "order_id": "order_9A33XWu170gUtm", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
                         "handler": function (responseb){
-                            alert(responseb.razorpay_payment_id);
+                            // alert(responseb.razorpay_payment_id);
                             data={
                                 'address':address,
                                 "payment_mode":"Razorpay",

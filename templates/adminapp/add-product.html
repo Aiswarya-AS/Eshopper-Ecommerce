@@ -23,6 +23,19 @@
   <link rel="stylesheet" href="{% static 'css/vertical-layout-light/style.css' %}">
   <!-- endinject -->
   <link rel="shortcut icon" href="images/favicon.png" />
+  <style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    /* Firefox */
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    </style>
 </head>
 <body>
 
@@ -227,12 +240,12 @@
 
                     <div class="form-group">
                       <label for="exampleInputPassword4">Price</label>
-                      <input type="text" class="form-control" name="price" id="exampleInputPassword4" placeholder="Price" >
+                      <input type="number" min="1" class="form-control" name="price" id="exampleInputPassword4" placeholder="Price" >
                     </div>
                     
                     <div class="form-group">
                       <label for="exampleInputPassword4">Stock</label>
-                      <input type="text" class="form-control" name="stock" id="exampleInputPassword4" placeholder="Available Stock" >
+                      <input type="number" min="1" class="form-control" name="stock" id="exampleInputPassword4" placeholder="Available Stock" >
                     </div>
 
 

@@ -6,6 +6,12 @@
           <span class="menu-title">Dashboard</span>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'salesReport' %}">
+          <i class="menu-icon mdi mdi-chart-line"></i>
+          <span class="menu-title">Sales Report</span>
+        </a>
+      </li>
       <li class="nav-item nav-category">User Management</li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
@@ -64,11 +70,8 @@
           <i class="menu-arrow"></i>
           
         </a>
-        <div class="collapse" id="tables">
-          <ul class="nav flex-column sub-menu">
-            <li class="nav-item"> <a class="nav-link" href="{% url 'orders' %}">Orders</a></li>
-          </ul>
-        </div>
+       
+        
         <div class="collapse" id="tables">
           <ul class="nav flex-column sub-menu">
             <li class="nav-item"> <a class="nav-link" href="{% url 'order_items' %}">Order Items</a></li>

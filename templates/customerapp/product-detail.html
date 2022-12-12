@@ -46,7 +46,11 @@ Product Detail
     </div>
     <!-- Page Header End -->
 
-    
+    {% for message in messages %}
+    <div class=" container alert alert-success" role="alert">
+        <h3 class="text-center">{{ message }}</h3>
+      </div>
+      {% endfor %}
     <!-- Shop Detail Start -->
     {% if single_product.id %}
     <span class="float-right m-5">

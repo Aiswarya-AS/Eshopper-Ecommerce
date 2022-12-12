@@ -42,7 +42,7 @@ def user_register(request):
         form=RegistrationForm(request.POST)
         if form.is_valid():
             phone=request.POST.get('phone')
-            print(phone)
+
             user=form.save()
             return redirect('login-page')
     return render(request,'customerapp/register.html',{
@@ -87,8 +87,21 @@ def login_otp(request):
         return redirect('home')
     if request.method =='GET' and request.GET.get('phone'):
         phone=request.GET.get('phone')
-        OtpGenerate.send_otp(phone)
-        return redirect('otp')
+        # user=CustomUser.objects.get(phone=phone)
+        # if user is not None:
+        #     OtpGenerate.send_otp(phone)
+        #     return redirect('otp')
+        # else:
+        #     messages.error(request,'Phone Number is not registered')
+        #     return redirect('login-page')
+        try:
+            user=CustomUser.objects.get(phone=phone)
+            OtpGenerate.send_otp(phone)
+            return redirect('otp')
+        except:
+            messages.error(request,'Phone Number is not registered')
+            return redirect('login-page')
+
     else:
         messages.error(request,'Please provide your phone number')
         return redirect('login-page')
@@ -326,7 +339,10 @@ def load_size_user(request):
 # User Profile
 @login_required(login_url='login-page')
 def my_profile(request):
-    return render(request,'customerapp/my_profile.html')
+    categories=Category.objects.all()
+    return render(request,'customerapp/my_profile.html',{
+        'category':categories
+    })
 
 
 

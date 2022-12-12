@@ -127,8 +127,11 @@ def admin_logout(request):
 @login_required(login_url='adminlogin')
 def show_users(request):
     users=CustomUser.objects.all().order_by('-id')
+    paginator=Paginator(users,3)
+    page=request.GET.get('page')
+    paged_user_list=paginator.get_page(page)
     return render(request,'adminapp/users.html',{
-        'users':users
+        'users':paged_user_list
     })
 
 
@@ -148,8 +151,11 @@ def block_user(request,id):
 @login_required(login_url='adminlogin')
 def category(request):
     cat=Category.objects.all()
+    paginator=Paginator(cat,1)
+    page=request.GET.get('page')
+    paged_category_list=paginator.get_page(page)
     context={
-        'categories':cat
+        'categories':paged_category_list
     }
     return render(request,'adminapp/category.html',context)
 
@@ -204,8 +210,11 @@ def delete_category(request,id):
 @login_required(login_url='adminlogin')
 def subcategory(request):
     sub_category=Subcategory.objects.all()
+    paginator=Paginator(sub_category,1)
+    page=request.GET.get('page')
+    paged_subcategory_list=paginator.get_page(page)
     context={
-        'sub_category':sub_category
+        'sub_category':paged_subcategory_list
     }
     return render(request,'adminapp/subcategory.html',context)
 
@@ -273,10 +282,12 @@ def delete_subcategory(request,id):
 
 @login_required(login_url='adminlogin')
 def products(request):
-    products=Product.objects.all()
-
+    products_list=Product.objects.all()
+    paginator=Paginator(products_list,1)
+    page=request.GET.get('page')
+    paged_products_list=paginator.get_page(page)
     return render(request,'adminapp/products.html',{
-        'products':products
+        'products':paged_products_list
     })
 
 
@@ -347,6 +358,7 @@ def add_product(request):
 
 @login_required(login_url='adminlogin')
 def edit_product(request,id):
+    categories=Category.objects.all()
     product=Product.objects.get(id=id)
     if request.method=='POST':
         productname=request.POST.get('productname')
@@ -381,7 +393,8 @@ def edit_product(request,id):
         return redirect('products')
     
     return render(request,'adminapp/edit-product.html',{
-        'product':product
+        'product':product,
+        'categories':categories
     })
 
 
@@ -473,22 +486,14 @@ def load_size(request):
 
 # Order Management
 @login_required(login_url='adminlogin')
-def orders(request):
-    orders=Order.objects.all()
-    order_items=OrderItem.objects.all()
-    context={
-        'orders':orders,
-        'order_items':order_items
-    }
-    return render(request,'adminapp/orders.html',context)
-
-
-@login_required(login_url='adminlogin')
 def order_items(request):
     order_items=OrderItem.objects.order_by("-id").all()
+    paginator=Paginator(order_items,1)
+    page=request.GET.get('page')
+    paged_orders_list=paginator.get_page(page)    
     context={
         
-        'order_items':order_items
+        'order_items':paged_orders_list
     }
     return render(request,'adminapp/orderitems.html',context)
 
@@ -496,8 +501,11 @@ def order_items(request):
 @login_required(login_url='adminlogin')
 def category_offer(request):
     cat_offer=CategoryOffer.objects.all()
+    paginator=Paginator(cat_offer,1)
+    page=request.GET.get('page')
+    paged_category_offer_list=paginator.get_page(page)
     return render(request,'adminapp/category_offer.html',{
-        'cat_offer':cat_offer
+        'cat_offer':paged_category_offer_list
     })
 
 
@@ -546,9 +554,12 @@ def delete_category_offer(request,id):
 
 @login_required(login_url='adminlogin')
 def subcategory_offer(request):
-    sub_offer=SubcategoryOffer.objects.all()
+    sub_offers=SubcategoryOffer.objects.all()
+    paginator=Paginator(sub_offers,1)
+    page=request.GET.get('page')
+    paged_sub_offer_list=paginator.get_page(page)
     return render(request,'adminapp/subcategory_offer.html',{
-        'sub_offer':sub_offer
+        'sub_offer':paged_sub_offer_list
     })
 
 
@@ -563,6 +574,9 @@ def add_subcategory_offer(request):
             if form.is_valid():
                 form.save()
                 return redirect('subcategory_offer')
+            else:
+                messages.error(request,'Already Exists!!')
+                return redirect('add_subcategory_offer')
         else:
             messages.error(request,'Percentage should be less than or equal to 70')
             return redirect('add_subcategory_offer')   
@@ -596,9 +610,12 @@ def delete_subcategory_offer(request,id):
 
 @login_required(login_url='adminlogin')
 def product_offer(request):
-    product_offer=ProductOffer.objects.all()
+    product_offers=ProductOffer.objects.all()
+    paginator=Paginator(product_offers,1)
+    page=request.GET.get('page')
+    paged_product_offer_list=paginator.get_page(page)
     return render(request,'adminapp/product_offer.html',{
-        'product_offer':product_offer
+        'product_offer':paged_product_offer_list
     })
 
 
@@ -613,6 +630,9 @@ def add_product_offer(request):
             if form.is_valid():
                 form.save()
                 return redirect('product_offer')
+            else:
+                messages.error(request,'Already Exists!!')
+                return redirect('add_product_offer')
         else:
             messages.error(request,'Percentage should be less than or equal to 70')
             return redirect('add_product_offer')
@@ -646,9 +666,12 @@ def delete_product_offer(request,id):
 
 @login_required(login_url='adminlogin')
 def coupons(request):
-    coupons=Coupon.objects.all()
+    coupons_list=Coupon.objects.all()
+    paginator=Paginator(coupons_list,1)
+    page=request.GET.get('page')
+    paged_coupons_list=paginator.get_page(page)
     return render(request,'adminapp/coupons.html',{
-        'coupons':coupons
+        'coupons':paged_coupons_list
     })
 
 
@@ -662,6 +685,9 @@ def add_coupons(request):
             if form.is_valid():
                 form.save()
                 return redirect('coupons')
+            else:
+                messages.error(request,'Already Exists!!')
+                return redirect('add_coupons')
         else:
             messages.error(request,'Percentage should be less than or equal to 70')
             return redirect('add_coupons')
