@@ -59,10 +59,13 @@
                 <div class="" style="padding-top: 1rem;">
                     <h4> <a style="padding:5rem;padding-top:2rem;color:black;" href="{% url 'login-page' %}">Already Have Account?</a></h4>
                  </div>
+                 <div>
+                    <p>{{form.errors}}</p>
+                 </div>
             </form>
             
 
-            <p style="color:red;">{{form.errors}}</p>
+            
         </div>
         
     </div>

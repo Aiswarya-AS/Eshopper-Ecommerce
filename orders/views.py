@@ -118,12 +118,21 @@ def order_cancel(request,id):
 
 
 def proceed_to_pay(request):
-    cart_item=CartItem.objects.filter(user=request.user)
-    total_price=0
-    for item in cart_item:
-        total_price=total_price+item.product.price*item.quantity
+    cart_items=CartItem.objects.filter(user=request.user)
+    cart_total_price=0
+    for cart_item in cart_items:
+        if cart_item.product.offer_price():
+            offer_price=Product.offer_price(cart_item.product)
+            cart_total_price+=(offer_price["new_price"]*cart_item.quantity)
+        else:
+            cart_total_price+=(cart_item.product.price*cart_item.quantity)
+
+        if cart_item.coupon_discount:
+            cart_total_price=cart_item.coupon_discount
+        else:
+            pass
     return JsonResponse({
-        'total_price':total_price
+        'total_price':cart_total_price
     })
 
 

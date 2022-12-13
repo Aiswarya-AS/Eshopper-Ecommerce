@@ -127,7 +127,7 @@ def admin_logout(request):
 @login_required(login_url='adminlogin')
 def show_users(request):
     users=CustomUser.objects.all().order_by('-id')
-    paginator=Paginator(users,3)
+    paginator=Paginator(users,10)
     page=request.GET.get('page')
     paged_user_list=paginator.get_page(page)
     return render(request,'adminapp/users.html',{
@@ -151,7 +151,7 @@ def block_user(request,id):
 @login_required(login_url='adminlogin')
 def category(request):
     cat=Category.objects.all()
-    paginator=Paginator(cat,1)
+    paginator=Paginator(cat,10)
     page=request.GET.get('page')
     paged_category_list=paginator.get_page(page)
     context={
@@ -210,7 +210,7 @@ def delete_category(request,id):
 @login_required(login_url='adminlogin')
 def subcategory(request):
     sub_category=Subcategory.objects.all()
-    paginator=Paginator(sub_category,1)
+    paginator=Paginator(sub_category,10)
     page=request.GET.get('page')
     paged_subcategory_list=paginator.get_page(page)
     context={
@@ -283,7 +283,7 @@ def delete_subcategory(request,id):
 @login_required(login_url='adminlogin')
 def products(request):
     products_list=Product.objects.all()
-    paginator=Paginator(products_list,1)
+    paginator=Paginator(products_list,10)
     page=request.GET.get('page')
     paged_products_list=paginator.get_page(page)
     return render(request,'adminapp/products.html',{
@@ -312,7 +312,13 @@ def load_subcategory(request,catid):
     }
     return render(request,'adminapp/dropdown.html',context)
 
-
+def editload_subcategory(request,catid):
+    subcategory=Subcategory.objects.filter(parent_cat_id=catid)
+    print(subcategory)
+    context={
+        'subcategory':subcategory
+    }
+    return render(request,'adminapp/dropdown_e.html',context)
 
 @login_required(login_url='adminlogin')
 def add_product(request):
@@ -488,7 +494,7 @@ def load_size(request):
 @login_required(login_url='adminlogin')
 def order_items(request):
     order_items=OrderItem.objects.order_by("-id").all()
-    paginator=Paginator(order_items,1)
+    paginator=Paginator(order_items,10)
     page=request.GET.get('page')
     paged_orders_list=paginator.get_page(page)    
     context={
@@ -501,7 +507,7 @@ def order_items(request):
 @login_required(login_url='adminlogin')
 def category_offer(request):
     cat_offer=CategoryOffer.objects.all()
-    paginator=Paginator(cat_offer,1)
+    paginator=Paginator(cat_offer,10)
     page=request.GET.get('page')
     paged_category_offer_list=paginator.get_page(page)
     return render(request,'adminapp/category_offer.html',{
@@ -555,7 +561,7 @@ def delete_category_offer(request,id):
 @login_required(login_url='adminlogin')
 def subcategory_offer(request):
     sub_offers=SubcategoryOffer.objects.all()
-    paginator=Paginator(sub_offers,1)
+    paginator=Paginator(sub_offers,10)
     page=request.GET.get('page')
     paged_sub_offer_list=paginator.get_page(page)
     return render(request,'adminapp/subcategory_offer.html',{
@@ -611,7 +617,7 @@ def delete_subcategory_offer(request,id):
 @login_required(login_url='adminlogin')
 def product_offer(request):
     product_offers=ProductOffer.objects.all()
-    paginator=Paginator(product_offers,1)
+    paginator=Paginator(product_offers,10)
     page=request.GET.get('page')
     paged_product_offer_list=paginator.get_page(page)
     return render(request,'adminapp/product_offer.html',{
@@ -667,7 +673,7 @@ def delete_product_offer(request,id):
 @login_required(login_url='adminlogin')
 def coupons(request):
     coupons_list=Coupon.objects.all()
-    paginator=Paginator(coupons_list,1)
+    paginator=Paginator(coupons_list,10)
     page=request.GET.get('page')
     paged_coupons_list=paginator.get_page(page)
     return render(request,'adminapp/coupons.html',{

@@ -63,7 +63,7 @@
                   <img src="" alt="">
                   <small class="text-muted">Quantity: {{ cart_item.quantity }}</small>
                 </div>
-                <span class="text-muted">${{ cart_item.product.price }}</span>
+                <span class="text-muted">₹{{ cart_item.product.price }}</span>
               </li>
               
               {% endfor %}
@@ -73,11 +73,11 @@
               </li>
                 <li class="list-group-item d-flex justify-content-between">
                 <span> Discount Price</span>
-                <strong id="discount_price" style="color: green;">0</strong>
+                <strong id="discount_price" style="color: green;"> {% if discount %} -{{ discount }} {% else %} 0 {% endif %}</strong>
               </li>
               <li class="list-group-item d-flex justify-content-between">
                 <span>Total </span>
-                <strong id="total" name="total">{{ total|floatformat:"2"  }}</strong>
+                <strong id="total" name="total">{{ total_p|floatformat:"2"  }}</strong>
                 
               </li>
               
@@ -236,7 +236,7 @@
             return actions.order.create({
               purchase_units: [{
                 amount: {
-                  value: {{ total }} // Can also reference a variable or function
+                  value: {{ total_p|floatformat:"2" }} // Can also reference a variable or function
                 }
               }]
             });
@@ -246,7 +246,7 @@
             return actions.order.capture().then(function(orderData) {
               // Successful capture! For dev/demo purposes:
               console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
-              alert(orderData.id);
+              //alert(orderData.id);
               //const transaction = orderData.purchase_units[0].payments.captures[0]; -->
               //alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
               // When ready to go live, remove the alert and show a success message within this page. For example:
@@ -284,6 +284,7 @@
                 var code=document.getElementById('code').value
                 console.log(code)
               
+                if(flag==0){
 
                   $.ajax({
                     type:"GET",
@@ -296,11 +297,15 @@
 
                       
                         if(r.status==true){
-
-                        
-                        $('#total').text("₹"+r.total)
+                          
+                            $('#total').text("₹"+r.total)
                         $('#discount_price').text("-"+r.discount)
                         Qual.success("Success !","Coupon applied");
+                        
+                          
+
+                        
+                        
                       }else{
                         
                         Qual.error("Oh no !","The Coupon has expired!!!!!Try another Coupon...",);
@@ -317,6 +322,10 @@
                   });
                   flag++;
                   console.log(flag);
+                  
+                }else{
+                  Qual.error("Coupon already applied...");
+                  }
 
                         
           
@@ -354,6 +363,10 @@
             inp.remove();
             toastr.info('Copied to clipboard');
             }
+
+
+
+
         </script>
 
 

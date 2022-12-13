@@ -332,6 +332,7 @@ def apply_coupon(request):
             if coupon.valid_from <= today and coupon.valid_to >= today:
                 total-=coupon.discount
                 cart_item.coupon_discount=total
+                cart_item.discount=coupon.discount
                 cart_item.save()
                 status=True
             else:
@@ -350,7 +351,8 @@ def apply_coupon(request):
 
 
 @login_required(login_url='login-page')
-def checkout(request,total=0,quantity=0):
+def checkout(request,total=0,quantity=0,total_p=0):
+    
     today=date.today()
     coupons=Coupon.objects.all()
     address=Address.objects.filter(user=request.user)
@@ -362,14 +364,23 @@ def checkout(request,total=0,quantity=0):
                 total=round(total,2)
         else:
             total+=(cart_item.product.price*cart_item.quantity)
-        quantity+=cart_item.quantity
+    total_p=total
+    discount=0
+    if cart_item.coupon_discount:
+        total_p=cart_item.coupon_discount
+        discount=cart_item.discount
+    else:
+        pass
+        # quantity+=cart_item.quantity
 
     return render(request,'customerapp/checkout.html',{
         'cart_items':cart_items,
         'total':total,
         'quantity':quantity,
         'address':address,
-        'coupons':coupons
+        'coupons':coupons,
+        'total_p':total_p,
+        'discount':discount
     })
 
 

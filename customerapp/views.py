@@ -17,6 +17,7 @@ from category.models import Variations
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from decouple import config
+from django.contrib import auth
 # Create your views here.
 
 
@@ -41,13 +42,60 @@ def user_register(request):
     if request.method=='POST':
         form=RegistrationForm(request.POST)
         if form.is_valid():
-            phone=request.POST.get('phone')
+            fname=form.cleaned_data["first_name"]
+            lname=form.cleaned_data["last_name"]
+            email=form.cleaned_data["email"]
+            phone=form.cleaned_data["phone"]
+            password=form.cleaned_data["password1"]
+            
 
-            user=form.save()
-            return redirect('login-page')
+
+            request.session["first_name"]=fname
+            request.session["last_name"]=lname
+            request.session["email"]=email
+            request.session["phone"]=phone
+            request.session["password"]=password
+            OtpGenerate.send_otp(phone)
+            return redirect('signup-otp')
+
     return render(request,'customerapp/register.html',{
         'form':form
     })
+
+def signup_otp(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    return render(request,'customerapp/signup-otp.html')
+def verify_signup_otp(request):
+    obj=OtpGenerate()
+    if request.method=='POST':
+        re_otp=request.POST.get('otp')
+        ge_otp=obj.Otp
+        if re_otp==ge_otp:
+            first_name=request.session["first_name"]
+            last_name=request.session["last_name"]
+            email=request.session["email"]
+            phone=request.session["phone"]
+            password=request.session["password"]
+
+
+            user=CustomUser.objects.create_user(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone=phone,
+                password=password
+            )
+            user.phone=phone
+            user.save()
+            auth.login(request,user)
+            return redirect('home')
+        else:
+            messages.error(request,"Invalid Otp")
+            return redirect('signup-otp')
+    else:
+        messages.error(request,"Invalid Credentials")
+        return redirect('signup-otp')
 
 
 def login_page(request):
@@ -65,7 +113,7 @@ class OtpGenerate():
     def send_otp(phone):
         account_sid=config('account_sid')
         auth_token=config('auth_token')
-        target_number = '+91' + phone
+        target_number = '+919961931809' 
         twilio_number=config('twilio_number')
         otp=random.randint(1000,9999)
         OtpGenerate.Otp=str(otp)
@@ -87,17 +135,10 @@ def login_otp(request):
         return redirect('home')
     if request.method =='GET' and request.GET.get('phone'):
         phone=request.GET.get('phone')
-        # user=CustomUser.objects.get(phone=phone)
-        # if user is not None:
-        #     OtpGenerate.send_otp(phone)
-        #     return redirect('otp')
-        # else:
-        #     messages.error(request,'Phone Number is not registered')
-        #     return redirect('login-page')
         try:
-            user=CustomUser.objects.get(phone=phone)
-            OtpGenerate.send_otp(phone)
-            return redirect('otp')
+            if CustomUser.objects.get(phone=phone):
+                OtpGenerate.send_otp(phone)
+                return redirect('otp')
         except:
             messages.error(request,'Phone Number is not registered')
             return redirect('login-page')
@@ -222,7 +263,7 @@ def login_pass(request):
                 else:
                     return redirect('adminlogin')
         else:
-            messages.info(request,"Phone Number or Password is Incorrect")
+            messages.info(request,"Email or Password is Incorrect")
             return redirect(login_pass)
     return render(request,'customerapp/login-pass.html')
 

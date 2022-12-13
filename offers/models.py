@@ -1,25 +1,24 @@
 from django.db import models
 from category.models import Category,Subcategory,Product
-from accounts.models import CustomUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 class CategoryOffer(models.Model):
     category_name=models.OneToOneField(Category,on_delete=models.CASCADE)
-    discount=models.IntegerField()
+    discount=models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(70)])
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
     is_valid=models.BooleanField(default=True)
 
 class SubcategoryOffer(models.Model):
     subcategory_name=models.OneToOneField(Subcategory,on_delete=models.CASCADE)
-    discount=models.IntegerField()
+    discount=models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(70)])
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
     is_valid=models.BooleanField(default=True)
 
 class ProductOffer(models.Model):
     product_name=models.OneToOneField(Product,on_delete=models.CASCADE)
-    discount=models.IntegerField()
+    discount=models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(70)])
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
     is_valid=models.BooleanField(default=True)

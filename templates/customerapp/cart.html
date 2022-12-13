@@ -115,26 +115,9 @@ Your Cart
                             <!-- </form> -->
                             </td>
                             <td id="sub_total{{ forloop.counter }}" class="align-middle">₹{{ cart_item.sub_total }} </td>
-                            <td class="align-middle"><a href="#myModal" class="trigger-btn" data-toggle="modal"> <button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></a></td>
+                            <td class="align-middle"><a href="{% url 'delete_cart_item' cart_item.product.id cart_item.id %}" onclick="delcart_item()" type="button"class="btn btn-sm btn-primary"> <i class="fa fa-times"></i></a></td>
                         </tr>
-                        <div id="myModal" class="modal fade">
-                            <div class="modal-dialog modal-confirm">
-                                <div class="modal-content">
-                                    <div class="modal-header flex-column">
-                    
-                                        <h4 class="modal-title w-100">Are you sure?</h4>	
-                                        <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Do you really want to  remove {{ cart_item.product.product_name }} from your cart? </p>
-                                    </div>
-                                    <div class="modal-footer justify-content-center">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                        <a href="{% url 'delete_cart_item' cart_item.product.id cart_item.id %}"> <button class="btn btn-sm btn-primary">Yes</button></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> 
+                
                         {% endfor %}
                     </tbody>
                 </table>
@@ -179,8 +162,32 @@ Your Cart
 {% endif %}
     {% include 'customerapp/includes/footer.html' %}
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+        function delcart_item() {
+            console.log('jdfjkfhd')
+          event.preventDefault();
+          var dlt = event.currentTarget.href
+          console.log(dlt)
+          Swal.fire({
+            title: 'Are you sure want to delete?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2DAD49',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Back',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              
+              window.location = dlt;
+            }
+          })
+        }
+      </script>
     
     {% block cart %}
         <script type="text/javascript" src="{% static 'js/cart.js' %}"></script>

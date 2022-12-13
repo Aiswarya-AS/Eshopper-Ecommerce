@@ -76,7 +76,7 @@ Store
                             </div> 
                         </div>
                     </div>
-                <div class="filter-content collapse show" id="collapse_3" style="">
+                <div class="filter-content collapse show" id="collapse_3" >
                     <div class="card-body">
                         <h5 class="font-weight-semi-bold mb-4">Filter by price</h5>
                     <form action="{% url 'filter_price' %}" method="GET">
@@ -127,7 +127,7 @@ Store
             </div>
             <!-- Shop Sidebar End -->
 
-
+            {% if products %}
             <!-- Shop Product Start -->
             <div class="col-lg-9 col-md-12">
                 <div class="row pb-3">
@@ -181,6 +181,9 @@ Store
             
                     </div>
                     {% endfor %}
+                    {% else %}
+                        <h2 style="padding-left: 20rem;">No Products Available</h2>
+                    {% endif %}
 
                     
     

@@ -25,6 +25,7 @@ urlpatterns = [
     path('editproduct/<int:id>/',views.edit_product,name='editproduct'),
     path('addproduct/',views.add_product,name='addproduct'),
     path('subcataddproduct/<int:catid>/',views.load_subcategory,name='load-subcategory'),
+    path('editsubcataddproduct/<int:catid>/',views.editload_subcategory,name='editload-subcategory'),
     path('deleteproduct/<int:id>/',views.delete_product,name='deleteproduct'),
 
     # Product Variation

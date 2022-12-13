@@ -267,29 +267,29 @@
                        
                     <div class="form-group">
                       <label>Image upload</label>
-                      <div class="input-group col-xs-12">
-                        <input type="file" name="productimage1" required>
+                      <div  class="input-group col-xs-12">
+                        <input id="id" type="file" name="productimage1" required oninput="checker(this)">
                         <img src="{{ product.img1.url }}" style="width:4rem;height:4rem;" alt="">
                       </div>
                     </div>
                     <div class="form-group">
                       <label>Image upload</label>
                       <div class="input-group col-xs-12">
-                        <input type="file" name="productimage2" required>
+                        <input id="id" type="file" name="productimage2" required oninput="checker(this)">
                         <img src="{{ product.img2.url }}" style="width:4rem;height:4rem;" alt="">
                       </div>
                     </div>
                     <div class="form-group">
                       <label>Image upload</label>
                       <div class="input-group col-xs-12">
-                        <input type="file" name="productimage3" required>
+                        <input id="id" type="file" name="productimage3" required oninput="checker(this)">
                         <img src="{{ product.img3.url }}" style="width:4rem;height:4rem;" alt="">
                       </div>
                     </div>
                     <div class="form-group">
                       <label>Image upload</label>
                       <div class="input-group col-xs-12">
-                        <input  type="file" name="productimage4" required>
+                        <input id="id" type="file" name="productimage4" required oninput="checker(this)">
                         <img src="{{ product.img4.url }}" style="width:4rem;height:4rem;" alt="">
                         <span>
                          
@@ -359,15 +359,22 @@
 <script src="{% static 'js/Chart.roundedBarCharts.js' %}"></script>
 <!-- End custom js for this page-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>
   $(document).ready(function(){
     $('#select1').change(function(){
       var catid=$('#select1').val()
-      $('#select2').load("subcataddproduct/"+catid)
+      $('#select2').load("editsubcataddproduct/"+catid)
     })
   })
+  function checker(id){
+    img = document.getElementById(id.id).value
+    if(!img.match(/\.(jpg|jpeg|png|gif)$/)){
+      swal("image should be jpg , jpeg , png")
+      document.getElementById(id.id).value = "";
+  }
+}
 </script>
 
 
