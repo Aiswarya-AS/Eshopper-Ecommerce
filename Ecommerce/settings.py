@@ -25,8 +25,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['54.250.184.92','localhost']
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['54.250.184.92','localhost','.eshopper.ml']
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -84,25 +84,25 @@ WSGI_APPLICATION = "Ecommerce.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql_psycopg2",
-#         "NAME":'eshopdb',
-#         "USER":'eshopdbuser',
-#         "PASSWORD":'7890',
-#         "HOST":'localhost'
-#     }
-# }
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME":'edb',
-        "USER":'postgres',
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME":'eshopdb1',
+        "USER":'eshopuser',
         "PASSWORD":'1234',
         "HOST":'localhost'
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME":'edb',
+#         "USER":'postgres',
+#         "PASSWORD":'1234',
+#         "HOST":'localhost'
+#     }
+# }
 
 
 # Password validation

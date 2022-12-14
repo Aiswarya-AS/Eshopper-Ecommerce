@@ -126,11 +126,12 @@ def proceed_to_pay(request):
             cart_total_price+=(offer_price["new_price"]*cart_item.quantity)
         else:
             cart_total_price+=(cart_item.product.price*cart_item.quantity)
-
+        price=cart_total_price
+        print(price,'///////')
         if cart_item.coupon_discount:
             cart_total_price=cart_item.coupon_discount
         else:
-            pass
+            cart_total_price=price
     return JsonResponse({
         'total_price':cart_total_price
     })

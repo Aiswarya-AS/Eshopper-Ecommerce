@@ -331,14 +331,19 @@ def product_detail(request,category_slug,subcategory_slug,product_slug):
 
 
 def search(request):
+    category=Category.objects.all()
     if 'keyword' in request.GET:
         keyword=request.GET['keyword']
         if keyword:
             
             products=Product.objects.order_by('-added_date').filter(product_name__icontains=keyword)
+        else:
+            return HttpResponseRedirect(request.META["HTTP_REFERER"])
+
 
     context={
-        'products':products
+        'products':products,
+        'category':category
     }
     
     return render(request,'customerapp/store.html',context)
