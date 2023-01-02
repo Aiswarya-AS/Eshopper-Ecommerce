@@ -360,7 +360,7 @@ def add_product(request):
             return redirect('addproduct')
 
     return redirect('addingproduct')
-
+# have some problems with product edit
 
 @login_required(login_url='adminlogin')
 def edit_product(request,id):
