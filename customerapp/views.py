@@ -391,7 +391,7 @@ def my_profile(request):
     })
 
 
-
+# have some isuue with password reset
 def change_password(request):
     if request.method=='POST':
         current_password=request.POST.get('current_password')
