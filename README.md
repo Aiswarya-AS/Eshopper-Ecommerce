@@ -2,6 +2,10 @@
 
 <p id="description">An ecommerce project is an online platform or website that facilitates the buying and selling of products or services over the internet. It enables businesses and individuals to showcase their products interact with customers process transactions and manage orders and inventory in a digital environment.</p>
 
+<h2>Project Screenshots:</h2>
+
+<img src="https://drive.google.com/file/d/1oFCdxTK26tECT7QWtwkV4OZeJiqKC7CW/view?usp=sharing" alt="project-screenshot" width="500" height="500"/>
+
   
   
 <h2>🧐 Features</h2>
